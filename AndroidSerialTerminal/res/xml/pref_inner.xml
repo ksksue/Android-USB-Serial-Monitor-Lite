@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Terminal Settings">
-	    <CheckBoxPreference
-	        android:key="cb1"
-	        android:title="cbtitle1"
-	        android:summary="cbsummary" />
+	<PreferenceCategory android:title="Display Settings">
+		<ListPreference
+		    android:key="display_list"
+		    android:title="Display"
+		    android:summary="@string/display_summary"
+		    android:entries="@array/display_entries"
+		    android:entryValues="@array/display_entryvalues"
+		/>
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, AndroidSerialTerminal!</string>
     <string name="app_name">AndroidSerialTerminal</string>
+    <string name="display_summary">Select the display type</string>
 
 </resources>

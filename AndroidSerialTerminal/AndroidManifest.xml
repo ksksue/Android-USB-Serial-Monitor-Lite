@@ -26,6 +26,7 @@
                 android:resource="@xml/device_filter" />
             
         </activity>
+        <activity android:name="AndroidSerialTerminalPrefActivity"></activity>
     </application>
 
 </manifest>

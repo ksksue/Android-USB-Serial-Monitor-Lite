@@ -6,10 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,11 +22,16 @@ import android.widget.TextView;
 public class AndroidSerialTerminal extends Activity {
 
 	final int SERIAL_BAUDRATE = FTDriver.BAUD115200;
-	final int mOutputType = 0;
 	
 	final boolean SHOW_LOGCAT = false;
 	
 	private static final int MENU_ID_SETTING = 0;
+	private static final int REQUEST_PREFERENCE = 0;
+
+	// Defines of Display Settings
+	private static final int DISP_CHAR	= 0;
+	private static final int DISP_DEC	= 1;
+	private static final int DISP_HEX	= 2;
 	
 	FTDriver mSerial;
 
@@ -37,6 +46,8 @@ public class AndroidSerialTerminal extends Activity {
 
     private Button btWrite;
     private EditText etWrite;
+    
+    private int mDisplayType=DISP_CHAR;
     
     /** Called when the activity is first created. */
     @Override
@@ -73,6 +84,40 @@ public class AndroidSerialTerminal extends Activity {
         });
     }
     
+    // ---------------------------------------------------------------------------------------
+    // Menu Button
+    // ---------------------------------------------------------------------------------------
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_ID_SETTING :
+			startActivityForResult(new Intent().setClassName(this.getPackageName(),
+					AndroidSerialTerminalPrefActivity.class.getName()),REQUEST_PREFERENCE);
+			return true;
+		default :
+			return false;
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    super.onActivityResult(requestCode, resultCode, data);
+	    if (requestCode == REQUEST_PREFERENCE) {
+
+	        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+	        
+	        String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
+	        mDisplayType = Integer.valueOf(res);
+	    }
+	}
+    // ---------------------------------------------------------------------------------------
+	
     @Override
     public void onDestroy() {
 		mSerial.end();
@@ -106,7 +151,7 @@ public class AndroidSerialTerminal extends Activity {
 					for(i=0;i<len;++i) {
 						if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 						// TODO: change the output type from UI
-						switch(mOutputType) {
+						switch(mDisplayType) {
 						case 0 : 
 							// "\r":CR(0x0D) "\n":LF(0x0A)
 							if (rbuf[i] == 0x0D) {
