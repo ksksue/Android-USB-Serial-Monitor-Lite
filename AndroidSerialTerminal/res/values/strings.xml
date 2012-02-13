@@ -4,5 +4,6 @@
     <string name="hello">Hello World, AndroidSerialTerminal!</string>
     <string name="app_name">AndroidSerialTerminal</string>
     <string name="display_summary">Select the display type</string>
+    <string name="baudrate_summary">Baud rate 9600</string>
 
 </resources>

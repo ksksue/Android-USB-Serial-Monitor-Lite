@@ -20,8 +20,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class AndroidSerialTerminal extends Activity {
-
-	final int SERIAL_BAUDRATE = FTDriver.BAUD115200;
 	
 	final boolean SHOW_LOGCAT = false;
 	
@@ -39,8 +37,8 @@ public class AndroidSerialTerminal extends Activity {
 	private String mText;
 	private boolean mStop=false;
 	private boolean mStopped=true;
-		
-	String TAG = "FTSampleTerminal";
+	
+	String TAG = "AndroidSerialTerminal";
     
     Handler mHandler = new Handler();
 
@@ -48,6 +46,7 @@ public class AndroidSerialTerminal extends Activity {
     private EditText etWrite;
     
     private int mDisplayType=DISP_CHAR;
+    private int mBaudrate=FTDriver.BAUD9600;
     
     /** Called when the activity is first created. */
     @Override
@@ -68,7 +67,10 @@ public class AndroidSerialTerminal extends Activity {
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(mUsbReceiver, filter);
         
-        if(mSerial.begin(SERIAL_BAUDRATE)) {
+        // load default baud rate
+        mBaudrate = loadDefaultBaudrate();
+        
+        if(mSerial.begin(mBaudrate)) {
         	mainloop();
         }
         
@@ -114,6 +116,13 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
 	        mDisplayType = Integer.valueOf(res);
+	        
+	        // reset baudrate
+	        res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
+	        if(mBaudrate != Integer.valueOf(res)) {
+	        	mBaudrate = Integer.valueOf(res);
+	        	mSerial.setBaudrate(mBaudrate, 0);
+	        }
 	    }
 	}
     // ---------------------------------------------------------------------------------------
@@ -206,13 +215,21 @@ public class AndroidSerialTerminal extends Activity {
 		}
 	};
 	
+	// Load default baud rate
+	int loadDefaultBaudrate() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
+        return Integer.valueOf(res);
+	}
+	
     // BroadcastReceiver when insert/remove the device USB plug into/from a USB port  
     BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
     		String action = intent.getAction();
     		if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
     			mSerial.usbAttached(intent);
-				mSerial.begin(SERIAL_BAUDRATE);
+    			mBaudrate = loadDefaultBaudrate();
+				mSerial.begin(mBaudrate);
     			mainloop();
 				
     		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {

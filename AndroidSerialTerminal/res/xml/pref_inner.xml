@@ -9,4 +9,15 @@
 		    android:entryValues="@array/display_entryvalues"
 		/>
 	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Baudrate Setting">
+		<ListPreference
+		    android:key="baudrate_list"
+		    android:title="Baudrate"
+		    android:summary="@string/baudrate_summary"
+		    android:entries="@array/baudrate_entries"
+		    android:entryValues="@array/baudrate_entryvalues"
+		/>
+	</PreferenceCategory>
+	
 </PreferenceScreen>
