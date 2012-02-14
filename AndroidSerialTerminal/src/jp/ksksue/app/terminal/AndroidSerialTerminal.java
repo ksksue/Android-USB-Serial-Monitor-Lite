@@ -2,6 +2,7 @@ package jp.ksksue.app.terminal;
 
 import jp.ksksue.driver.serial.FTDriver;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +48,9 @@ public class AndroidSerialTerminal extends Activity {
     
     private int mDisplayType=DISP_CHAR;
     private int mBaudrate=FTDriver.BAUD9600;
+
+    private static final String ACTION_USB_PERMISSION =
+        "jp.ksksue.app.terminal.USB_PERMISSION";
     
     /** Called when the activity is first created. */
     @Override
@@ -69,6 +73,11 @@ public class AndroidSerialTerminal extends Activity {
         
         // load default baud rate
         mBaudrate = loadDefaultBaudrate();
+        
+        // for requesting permission
+        // setPermissionIntent() before begin()
+        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        mSerial.setPermissionIntent(permissionIntent);
         
         if(mSerial.begin(mBaudrate)) {
         	mainloop();
