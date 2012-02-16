@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom|left|right"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/etWrite"
@@ -36,12 +36,13 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >
-
+            
             <TextView
                 android:id="@+id/tvSerial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="terminal" />
+                android:text="" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
