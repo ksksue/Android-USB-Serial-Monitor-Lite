@@ -10,14 +10,23 @@
 		/>
 	</PreferenceCategory>
 	
-	<PreferenceCategory android:title="Baudrate Setting">
+	<PreferenceCategory android:title="Linefeed Code Setting">
 		<ListPreference
-		    android:key="baudrate_list"
-		    android:title="Baudrate"
-		    android:summary="@string/baudrate_summary"
-		    android:entries="@array/baudrate_entries"
-		    android:entryValues="@array/baudrate_entryvalues"
+		    android:key="linefeedcode_list"
+		    android:title="Linefeed Code"
+		    android:summary="@string/linefeedcode_summary"
+		    android:entries="@array/linefeedcode_entries"
+		    android:entryValues="@array/linefeedcode_entryvalues"
 		/>
 	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="Baudrate Setting" >
+        <ListPreference
+            android:entries="@array/baudrate_entries"
+            android:entryValues="@array/baudrate_entryvalues"
+            android:key="baudrate_list"
+            android:summary="@string/baudrate_summary"
+            android:title="Baudrate" />
+    </PreferenceCategory>
 	
 </PreferenceScreen>

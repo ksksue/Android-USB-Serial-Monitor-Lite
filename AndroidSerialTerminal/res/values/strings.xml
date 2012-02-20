@@ -5,5 +5,6 @@
     <string name="app_name">AndroidSerialTerminal</string>
     <string name="display_summary">Select the display type</string>
     <string name="baudrate_summary">Baud rate 9600</string>
-
+    <string name="linefeedcode_summary">Linefeed Code CR/LF</string>
+    
 </resources>

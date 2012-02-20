@@ -10,6 +10,16 @@
         <item >1</item>
         <item >2</item>
     </string-array>
+    <string-array name="linefeedcode_entries">
+        <item >CR</item>
+        <item >CR+LF</item>
+        <item >LF</item>
+    </string-array>
+    <string-array name="linefeedcode_entryvalues">
+        <item >0</item>
+        <item >1</item>
+        <item >2</item>
+    </string-array>
     <string-array name="baudrate_entries">
         <item >9600</item>
         <item >14400</item>

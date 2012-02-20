@@ -22,8 +22,6 @@ import android.widget.TextView;
 
 public class AndroidSerialTerminal extends Activity {
 	
-	final boolean SHOW_LOGCAT = false;
-	
 	private static final int MENU_ID_SETTING = 0;
 	private static final int REQUEST_PREFERENCE = 0;
 
@@ -31,6 +29,11 @@ public class AndroidSerialTerminal extends Activity {
 	private static final int DISP_CHAR	= 0;
 	private static final int DISP_DEC	= 1;
 	private static final int DISP_HEX	= 2;
+	
+	// Linefeed Code Settings
+	private static final int LINEFEED_CODE_CR		= 0;
+	private static final int LINEFEED_CODE_CRLF	= 1;
+	private static final int LINEFEED_CODE_LF		= 2;
 	
 	FTDriver mSerial;
 
@@ -47,12 +50,20 @@ public class AndroidSerialTerminal extends Activity {
     private EditText etWrite;
     
     private int mDisplayType=DISP_CHAR;
+    private int mLinefeedCode=LINEFEED_CODE_CRLF;
     private int mBaudrate=FTDriver.BAUD9600;
 
     private static final String ACTION_USB_PERMISSION =
         "jp.ksksue.app.terminal.USB_PERMISSION";
     
-    /** Called when the activity is first created. */
+    // Linefeed
+    private final static String BR = System.getProperty("line.separator");
+    
+	// debug settings
+	final boolean SHOW_LOGCAT = false;
+	final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
+
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,13 +97,27 @@ public class AndroidSerialTerminal extends Activity {
         // ---------------------------------------------------------------------------------------
        // Write Button
         // ---------------------------------------------------------------------------------------
-        btWrite.setOnClickListener(new View.OnClickListener() {
-    		@Override
-    		public void onClick(View v) {
-    			String strWrite = etWrite.getText().toString();
-    			mSerial.write(strWrite.getBytes(),strWrite.length());
-    		}
-        });
+		if (!USE_WRITE_BUTTON_FOR_DEBUG) {
+			btWrite.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String strWrite = etWrite.getText().toString();
+					mSerial.write(strWrite.getBytes(), strWrite.length());
+				}
+			});
+		} else {
+			// Write test button for debug
+			btWrite.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String strWrite = "";
+					for (int i = 0; i < 3000; ++i) {
+						strWrite = strWrite + " " + Integer.toString(i);
+					}
+					mSerial.write(strWrite.getBytes(), strWrite.length());
+				}
+			});
+		} // end of if(SHOW_WRITE_TEST_BUTTON)
     }
     
     // ---------------------------------------------------------------------------------------
@@ -125,6 +150,9 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
 	        mDisplayType = Integer.valueOf(res);
+	        
+	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+	        mLinefeedCode = Integer.valueOf(res);
 	        
 	        // reset baudrate
 	        res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
@@ -170,31 +198,40 @@ public class AndroidSerialTerminal extends Activity {
 						if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 						// TODO: change the output type from UI
 						switch(mDisplayType) {
-						case 0 : 
+						case DISP_CHAR : 
 							// "\r":CR(0x0D) "\n":LF(0x0A)
-							if (rbuf[i] == 0x0D) {
-								mText = mText + "\r";
-							} else if (rbuf[i] == 0x0A) {
-								mText = mText + "\n";
+							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
+								mText = mText + BR;
+								++i;
+							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
+								mText = mText + BR;
+							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
+								mText = mText + BR;
 							} else {
 								mText = mText + "" +(char)rbuf[i];
 							}
 							break;
-						case 1 :
-							if (rbuf[i] == 0x0D) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + "\r";
-							} else if (rbuf[i] == 0x0A) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + "\n";
+						case DISP_DEC :
+							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
+								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
+								++i;
+							} else if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
+								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
+							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
+								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
 							} else {
 								mText = mText + " " + Byte.toString(rbuf[i]);
 							}							
 							break;
-						case 2 :
-							if (rbuf[i] == 0x0D) {
+						case DISP_HEX :
+							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
+								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
+								++i;
+							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
 								// TODO: output 2 length character (now not "0D", it's only "D".)
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + "\r";
-							} else if (rbuf[i] == 0x0A) {
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + "\n";
+								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
+							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
+								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
 							} else {
 								mText = mText + " "
 										+ Integer.toHexString((int) rbuf[i]);
