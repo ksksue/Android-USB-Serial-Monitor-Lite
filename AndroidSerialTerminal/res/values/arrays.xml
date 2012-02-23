@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
     <string-array name="display_entries">
         <item >Character</item>
         <item >Decimal</item>
@@ -10,6 +11,8 @@
         <item >1</item>
         <item >2</item>
     </string-array>
+    
+    
     <string-array name="linefeedcode_entries">
         <item >CR</item>
         <item >CR+LF</item>
@@ -20,6 +23,8 @@
         <item >1</item>
         <item >2</item>
     </string-array>
+    
+    
     <string-array name="baudrate_entries">
         <item >9600</item>
         <item >14400</item>
@@ -38,4 +43,67 @@
         <item >115200</item>
         <item >230400</item>
     </string-array>
+    
+    
+    <string-array name="databits_entries">
+        <item >7</item>
+        <item >8</item>
+    </string-array>
+    <string-array name="databits_entryvalues">
+        <item >7</item>
+        <item >8</item>
+    </string-array>
+    
+    
+    <string-array name="parity_entries">
+        <item >none</item>
+        <item >odd</item>
+        <item >even</item>
+        <item >mark</item>
+        <item >space</item>
+    </string-array>
+    <string-array name="parity_entryvalues">
+        <item >0</item>
+        <item >1</item>
+        <item >2</item>
+        <item >3</item>
+        <item >4</item>
+    </string-array>
+    
+    
+    <string-array name="stopbits_entries">
+        <item >1</item>
+        <item >1.5</item>
+        <item >2</item>
+    </string-array>
+    <string-array name="stopbits_entryvalues">
+        <item >0</item>
+        <item >1</item>
+        <item >2</item>
+    </string-array>
+    
+    
+    <string-array name="flowcontrol_entries">
+        <item >none</item>
+        <item >RTS/CTS</item>
+        <item >DTR/DSR</item>
+        <item >XON</item>
+    </string-array>
+    <string-array name="flowcontrol_entryvalues">
+        <item >0</item>
+        <item >1</item>
+        <item >2</item>
+        <item >3</item>
+    </string-array>
+    
+    
+    <string-array name="break_entries">
+        <item >no break</item>
+        <item >break</item>
+    </string-array>
+    <string-array name="break_entryvalues">
+        <item >0</item>
+        <item >1</item>
+    </string-array>
+    
 </resources>

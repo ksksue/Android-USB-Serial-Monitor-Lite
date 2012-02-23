@@ -153,6 +153,7 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
 	        mLinefeedCode = Integer.valueOf(res);
+	        //TODO: get values of settings(data bits and parity, stop bits, flow control, break)
 	        
 	        // reset baudrate
 	        res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));

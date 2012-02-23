@@ -6,5 +6,10 @@
     <string name="display_summary">Select the display type</string>
     <string name="baudrate_summary">Baud rate 9600</string>
     <string name="linefeedcode_summary">Linefeed Code CR/LF</string>
+    <string name="databits_summary">Data bits</string>
+    <string name="parity_summary">Parity check</string>
+    <string name="stopbits_summary">Stop bit</string>
+    <string name="flowcontrol_summary">Flow control</string>
+    <string name="break_summary">Break</string>
     
 </resources>
