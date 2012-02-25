@@ -49,9 +49,14 @@ public class AndroidSerialTerminal extends Activity {
     private Button btWrite;
     private EditText etWrite;
     
-    private int mDisplayType=DISP_CHAR;
-    private int mLinefeedCode=LINEFEED_CODE_CRLF;
-    private int mBaudrate=FTDriver.BAUD9600;
+    private int mDisplayType = DISP_CHAR;
+    private int mLinefeedCode = LINEFEED_CODE_CRLF;
+    private int mBaudrate = FTDriver.BAUD9600;
+    private int mDataBits = FTDriver.FTDI_SET_DATA_BITS_8;
+    private int mParity = FTDriver.FTDI_SET_DATA_PARITY_NONE;
+    private int mStopBits = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
+    private int mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+    private int mBreak = FTDriver.FTDI_SET_NOBREAK;
 
     private static final String ACTION_USB_PERMISSION =
         "jp.ksksue.app.terminal.USB_PERMISSION";
@@ -153,7 +158,40 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
 	        mLinefeedCode = Integer.valueOf(res);
-	        //TODO: get values of settings(data bits and parity, stop bits, flow control, break)
+
+	        res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
+	        if(mDataBits != Integer.valueOf(res)) {
+	        	mDataBits = Integer.valueOf(res);
+	        	mSerial.setSerialPropertyDataBit(mDataBits, FTDriver.CH_A);
+	        	//TODO: set serial properties to a chip
+	        }
+	        
+	        res = pref.getString("parity_list", Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
+	        if(mParity != Integer.valueOf(res)) {
+	        	mParity = Integer.valueOf(res);
+	        	mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
+	        	//TODO: set serial properties to a chip
+	        }
+	        
+	        res = pref.getString("stopbits_list", Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
+	        if(mStopBits != Integer.valueOf(res)) {
+	        	mStopBits = Integer.valueOf(res);
+	        	mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
+	        	//TODO: set serial properties to a chip
+	        }
+	        
+	        res = pref.getString("flowcontrol_list", Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
+	        if(mFlowControl != Integer.valueOf(res)) {
+	        	mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+	        	//TODO: set Flow Control
+	        }
+	        
+	        res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
+	        if(mBreak != Integer.valueOf(res)) {
+	        	mBreak = FTDriver.FTDI_SET_NOBREAK;
+	        	mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
+	        	//TODO: set serial properties to a chip
+	        }
 	        
 	        // reset baudrate
 	        res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
