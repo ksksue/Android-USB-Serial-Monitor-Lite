@@ -17,7 +17,8 @@
             android:entryValues="@array/baudrate_entryvalues"
             android:key="baudrate_list"
             android:summary="@string/baudrate_summary"
-            android:title="Baudrate" />
+            android:title="Baudrate"
+		     android:defaultValue="9600" />
     </PreferenceCategory>
     
 	<PreferenceCategory android:title="Data Bits Setting" >
@@ -77,6 +78,7 @@
 		    android:summary="@string/linefeedcode_summary"
 		    android:entries="@array/linefeedcode_entries"
 		    android:entryValues="@array/linefeedcode_entryvalues"
+		    android:defaultValue="2"
 		/>
 	</PreferenceCategory>
 	
