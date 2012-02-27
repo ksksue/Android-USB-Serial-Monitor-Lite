@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:title="Display Settings">
+	<PreferenceCategory android:title="@string/display_setting_title">
 		<ListPreference
 		    android:key="display_list"
-		    android:title="Display"
+		    android:title="@string/display_title"
 		    android:summary="@string/display_summary"
 		    android:entries="@array/display_entries"
 		    android:entryValues="@array/display_entryvalues"
@@ -11,70 +11,10 @@
 		/>
 	</PreferenceCategory>
 	
-	<PreferenceCategory android:title="Baudrate Setting" >
-        <ListPreference
-            android:entries="@array/baudrate_entries"
-            android:entryValues="@array/baudrate_entryvalues"
-            android:key="baudrate_list"
-            android:summary="@string/baudrate_summary"
-            android:title="Baudrate"
-		     android:defaultValue="9600" />
-    </PreferenceCategory>
-    
-	<PreferenceCategory android:title="Data Bits Setting" >
-        <ListPreference
-            android:entries="@array/databits_entries"
-            android:entryValues="@array/databits_entryvalues"
-            android:key="databits_list"
-            android:summary="@string/databits_summary"
-            android:title="Data bits"
-		     android:defaultValue="8" />
-    </PreferenceCategory>
-    
-	<PreferenceCategory android:title="Parity Setting" >
-        <ListPreference
-            android:entries="@array/parity_entries"
-            android:entryValues="@array/parity_entryvalues"
-            android:key="parity_list"
-            android:summary="@string/parity_summary"
-            android:title="Parity"
-		     android:defaultValue="0" />
-    </PreferenceCategory>
-	
-	<PreferenceCategory android:title="Stop Bits Setting" >
-        <ListPreference
-            android:entries="@array/stopbits_entries"
-            android:entryValues="@array/stopbits_entryvalues"
-            android:key="stopbits_list"
-            android:summary="@string/stopbits_summary"
-            android:title="Stop bits"
-		     android:defaultValue="0" />
-    </PreferenceCategory>
-	
-	<PreferenceCategory android:title="Flow Control Setting" >
-        <ListPreference
-            android:entries="@array/flowcontrol_entries"
-            android:entryValues="@array/flowcontrol_entryvalues"
-            android:key="flowcontrol_list"
-            android:summary="@string/flowcontrol_summary"
-            android:title="Flow Control"
-		     android:defaultValue="0" />
-    </PreferenceCategory>
-	
-	<PreferenceCategory android:title="Break Setting" >
-        <ListPreference
-            android:entries="@array/break_entries"
-            android:entryValues="@array/break_entryvalues"
-            android:key="break_list"
-            android:summary="@string/break_summary"
-            android:title="Break"
-		     android:defaultValue="0" />
-    </PreferenceCategory>
-    
-	<PreferenceCategory android:title="Linefeed Code Setting">
+	<PreferenceCategory android:title="@string/linefeedcode_setting_title">
 		<ListPreference
 		    android:key="linefeedcode_list"
-		    android:title="Linefeed Code"
+		    android:title="@string/linefeedcode_title"
 		    android:summary="@string/linefeedcode_summary"
 		    android:entries="@array/linefeedcode_entries"
 		    android:entryValues="@array/linefeedcode_entryvalues"
@@ -82,5 +22,54 @@
 		/>
 	</PreferenceCategory>
 	
+	<PreferenceCategory android:title="@string/serial_setting_title" >
+        <ListPreference
+            android:entries="@array/baudrate_entries"
+            android:entryValues="@array/baudrate_entryvalues"
+            android:key="baudrate_list"
+            android:summary="@string/baudrate_summary"
+            android:title="@string/baudrate_title"
+		     android:defaultValue="9600" />
+        
+        <ListPreference
+            android:entries="@array/databits_entries"
+            android:entryValues="@array/databits_entryvalues"
+            android:key="databits_list"
+            android:summary="@string/databits_summary"
+            android:title="@string/databits_title"
+		     android:defaultValue="8" />
+        
+        <ListPreference
+            android:entries="@array/parity_entries"
+            android:entryValues="@array/parity_entryvalues"
+            android:key="parity_list"
+            android:summary="@string/parity_summary"
+            android:title="@string/parity_title"
+		     android:defaultValue="0" />
+        
+        <ListPreference
+            android:entries="@array/stopbits_entries"
+            android:entryValues="@array/stopbits_entryvalues"
+            android:key="stopbits_list"
+            android:summary="@string/stopbits_summary"
+            android:title="@string/stopbits_title"
+		     android:defaultValue="0" />
+        
+        <ListPreference
+            android:entries="@array/flowcontrol_entries"
+            android:entryValues="@array/flowcontrol_entryvalues"
+            android:key="flowcontrol_list"
+            android:summary="@string/flowcontrol_summary"
+            android:title="@string/flowcontrol_title"
+		     android:defaultValue="0" />
+        
+        <ListPreference
+            android:entries="@array/break_entries"
+            android:entryValues="@array/break_entryvalues"
+            android:key="break_list"
+            android:summary="@string/break_summary"
+            android:title="@string/break_title"
+		     android:defaultValue="0" />
+    </PreferenceCategory>	
 	
 </PreferenceScreen>

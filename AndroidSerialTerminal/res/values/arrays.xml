@@ -56,11 +56,11 @@
     
     
     <string-array name="parity_entries">
-        <item >none</item>
-        <item >odd</item>
-        <item >even</item>
-        <item >mark</item>
-        <item >space</item>
+        <item >NONE</item>
+        <item >ODD</item>
+        <item >EVEN</item>
+        <item >MARK</item>
+        <item >SPACE</item>
     </string-array>
     <string-array name="parity_entryvalues">
         <item >0</item>
@@ -84,7 +84,7 @@
     
     
     <string-array name="flowcontrol_entries">
-        <item >none</item>
+        <item >NONE</item>
         <item >RTS/CTS</item>
         <item >DTR/DSR</item>
         <item >XON</item>
@@ -98,8 +98,8 @@
     
     
     <string-array name="break_entries">
-        <item >no break</item>
-        <item >break</item>
+        <item >NO BREAK</item>
+        <item >BREAK</item>
     </string-array>
     <string-array name="break_entryvalues">
         <item >0</item>
