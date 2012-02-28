@@ -18,10 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class AndroidSerialTerminal extends Activity {
-	
+	private static final int TEXT_MAX_SIZE = 8192;
 	private static final int MENU_ID_SETTING = 0;
 	private static final int REQUEST_PREFERENCE = 0;
 
@@ -37,6 +38,7 @@ public class AndroidSerialTerminal extends Activity {
 	
 	FTDriver mSerial;
 
+	private ScrollView mSvText;
 	private TextView mTvSerial;
 	private String mText;
 	private boolean mStop=false;
@@ -74,9 +76,11 @@ public class AndroidSerialTerminal extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        mSvText = (ScrollView) findViewById(R.id.svText);
         mTvSerial = (TextView) findViewById(R.id.tvSerial);
         btWrite = (Button) findViewById(R.id.btWrite);
         etWrite = (EditText) findViewById(R.id.etWrite);
+        
         
         // get service
         mSerial = new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
@@ -96,6 +100,7 @@ public class AndroidSerialTerminal extends Activity {
         mSerial.setPermissionIntent(permissionIntent);
         
         if(mSerial.begin(mBaudrate)) {
+        	loadDefaultSettingValues();
         	mainloop();
         }
         
@@ -221,7 +226,8 @@ public class AndroidSerialTerminal extends Activity {
 			int i;
 			int len;
 			byte[] rbuf = new byte[4096];
-						
+			mText = "";
+			
 			for(;;){//this is the main loop for transferring
 				
 				//////////////////////////////////////////////////////////
@@ -232,7 +238,10 @@ public class AndroidSerialTerminal extends Activity {
 				// TODO: UI:Show last line
 				if(len > 0) {
 					if(SHOW_LOGCAT) { Log.i(TAG,"Read  Length : "+len); }
-					mText = (String) mTvSerial.getText();
+//					mText = (String) mTvSerial.getText();
+					if(mText.length() > TEXT_MAX_SIZE) {
+						mText = mText.substring(mText.length()-TEXT_MAX_SIZE);
+					}
 					for(i=0;i<len;++i) {
 						if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 						// TODO: change the output type from UI
@@ -252,7 +261,7 @@ public class AndroidSerialTerminal extends Activity {
 							break;
 						case DISP_DEC :
 							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
+								mText = mText + " " + Byte.toString(rbuf[i]) + " " + Byte.toString(rbuf[i+1]) + BR;
 								++i;
 							} else if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
 								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
@@ -264,7 +273,7 @@ public class AndroidSerialTerminal extends Activity {
 							break;
 						case DISP_HEX :
 							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
+								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + " " + Integer.toHexString((int) rbuf[i+1]) + BR;
 								++i;
 							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
 								// TODO: output 2 length character (now not "0D", it's only "D".)
@@ -282,6 +291,7 @@ public class AndroidSerialTerminal extends Activity {
 					mHandler.post(new Runnable() {
 						public void run() {
 							mTvSerial.setText(mText);
+							mSvText.fullScroll(ScrollView.FOCUS_DOWN);
 						}
 					});
 				}
@@ -299,7 +309,38 @@ public class AndroidSerialTerminal extends Activity {
 			}
 		}
 	};
-	
+
+	void loadDefaultSettingValues() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
+        mDisplayType = Integer.valueOf(res);
+        
+        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+        mLinefeedCode = Integer.valueOf(res);
+
+        res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
+        mDataBits = Integer.valueOf(res);
+        mSerial.setSerialPropertyDataBit(mDataBits, FTDriver.CH_A);
+
+        res = pref.getString("parity_list", Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
+        mParity = Integer.valueOf(res);
+        mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
+        
+        res = pref.getString("stopbits_list", Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
+        mStopBits = Integer.valueOf(res);
+        mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
+        
+        res = pref.getString("flowcontrol_list", Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
+        mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+        mSerial.setFlowControl(FTDriver.CH_A, mFlowControl);
+        
+        res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
+        mBreak = FTDriver.FTDI_SET_NOBREAK;
+        mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
+        
+        mSerial.setSerialPropertyToChip(FTDriver.CH_A);
+	}
+
 	// Load default baud rate
 	int loadDefaultBaudrate() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);

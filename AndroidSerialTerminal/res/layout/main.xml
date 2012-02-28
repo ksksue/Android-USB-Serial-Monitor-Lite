@@ -27,7 +27,7 @@
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/ScrollView"
+        android:id="@+id/svText"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
 
