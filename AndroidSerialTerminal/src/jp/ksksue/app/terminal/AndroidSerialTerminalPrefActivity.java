@@ -38,6 +38,16 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 		}
 	}
 
+	public static class SettingDisplayPrefsFragment extends PreferenceFragment {
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			// show a Preference inner
+			addPreferencesFromResource(R.xml.pref_disp_inner);
+		}
+	}
+	
 	/*
 	 * @Override protected void onResume() { CharSequence cs =
 	 * getText(R.xml.pref_inner); ListPreference lp =

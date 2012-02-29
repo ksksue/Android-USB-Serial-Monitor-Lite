@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="@string/display_setting_title">
+	    <ListPreference
+		    android:key="fontsize_list"
+		    android:title="@string/fontsize_title"
+		    android:summary="@string/fontsize_summary"
+		    android:entries="@array/fontsize_entries"
+		    android:entryValues="@array/fontsize_entryvalues"
+		    android:defaultValue="12"
+		/>
+	
+		<ListPreference
+		    android:key="display_list"
+		    android:title="@string/display_title"
+		    android:summary="@string/display_summary"
+		    android:entries="@array/display_entries"
+		    android:entryValues="@array/display_entryvalues"
+		    android:defaultValue="2"
+		/>
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="@string/linefeedcode_setting_title">
+		<ListPreference
+		    android:key="linefeedcode_list"
+		    android:title="@string/linefeedcode_title"
+		    android:summary="@string/linefeedcode_summary"
+		    android:entries="@array/linefeedcode_entries"
+		    android:entryValues="@array/linefeedcode_entryvalues"
+		    android:defaultValue="2"
+		/>
+	</PreferenceCategory>
+	
+</PreferenceScreen>

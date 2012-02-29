@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 	<header	android:fragment="jp.ksksue.app.terminal.AndroidSerialTerminalPrefActivity$SettingPrefsFragment"
-				android:title="@string/terminal_header_title"
-				android:summary="@string/terminal_header_summary" />
+				android:title="@string/terminal_setting_header_title"
+				android:summary="@string/terminal_setting_header_summary" />
+	<header	android:fragment="jp.ksksue.app.terminal.AndroidSerialTerminalPrefActivity$SettingDisplayPrefsFragment"
+				android:title="@string/display_setting_header_title"
+				android:summary="@string/display_setting_header_summary" />
 </preference-headers>

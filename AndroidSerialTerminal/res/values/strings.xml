@@ -3,21 +3,28 @@
 
     <string name="app_name">AndroidSerialTerminal</string>
     
-    <string name="terminal_header_title">Terminal Settings</string>
-    <string name="terminal_header_summary"></string>
+    <string name="terminal_setting_header_title">Serial Settings</string>
+    <string name="terminal_setting_header_summary"></string>
 
+    <string name="display_setting_header_title">Display Settings</string>
+    <string name="display_setting_header_summary"></string>
+    
     <string name="display_setting_title">Display Setting</string>
+    
+    <string name="fontsize_title">Font size</string>
+    <string name="fontsize_summary">Choose font size</string>
+    
     <string name="display_title">Display</string>
-    <string name="display_summary">Select the display type</string>
+    <string name="display_summary">Choose char or dec, hex</string>
     
     <string name="linefeedcode_setting_title">Linefeed Code Setting</string>
     <string name="linefeedcode_title">Linefeed Code</string>
-    <string name="linefeedcode_summary">Linefeed Code CR/LF</string>
+    <string name="linefeedcode_summary">Choose CR or LF, CR/LF</string>
     
     <string name="serial_setting_title">Serial Setting</string>
     
     <string name="baudrate_title">Baudrate</string>
-    <string name="baudrate_summary">Baud rate 9600</string>
+    <string name="baudrate_summary">baud rate</string>
     
     <string name="databits_title">Data bits</string>
     <string name="databits_summary">Data bits</string>

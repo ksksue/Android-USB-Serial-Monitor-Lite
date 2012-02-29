@@ -51,6 +51,7 @@ public class AndroidSerialTerminal extends Activity {
     private Button btWrite;
     private EditText etWrite;
     
+    private int mTextFontSize = 12;
     private int mDisplayType = DISP_CHAR;
     private int mLinefeedCode = LINEFEED_CODE_CRLF;
     private int mBaudrate = FTDriver.BAUD9600;
@@ -81,7 +82,6 @@ public class AndroidSerialTerminal extends Activity {
         btWrite = (Button) findViewById(R.id.btWrite);
         etWrite = (EditText) findViewById(R.id.etWrite);
         
-        
         // get service
         mSerial = new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
           
@@ -101,6 +101,7 @@ public class AndroidSerialTerminal extends Activity {
         
         if(mSerial.begin(mBaudrate)) {
         	loadDefaultSettingValues();
+        	mTvSerial.setTextSize(mTextFontSize);
         	mainloop();
         }
         
@@ -160,6 +161,10 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
 	        mDisplayType = Integer.valueOf(res);
+	        
+	        res = pref.getString("fontsize_list", Integer.toString(12));
+	        mTextFontSize = Integer.valueOf(res);
+	        mTvSerial.setTextSize(mTextFontSize);
 	        
 	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
 	        mLinefeedCode = Integer.valueOf(res);
@@ -314,6 +319,9 @@ public class AndroidSerialTerminal extends Activity {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
         mDisplayType = Integer.valueOf(res);
+        
+        res = pref.getString("fontsize_list", Integer.toString(12));
+        mTextFontSize = Integer.valueOf(res);
         
         res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
         mLinefeedCode = Integer.valueOf(res);
