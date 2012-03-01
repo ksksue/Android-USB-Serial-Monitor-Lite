@@ -26,7 +26,8 @@ import android.widget.TextView;
 public class AndroidSerialTerminal extends Activity {
 	private static final int TEXT_MAX_SIZE = 8192;
 	private static final int MENU_ID_SETTING = 0;
-	private static final int MENU_ID_SENDTOEMAIL = 1;
+	private static final int MENU_ID_CLEARTEXT = 1;
+	private static final int MENU_ID_SENDTOEMAIL = 2;
 	private static final int REQUEST_PREFERENCE = 0;
 
 	// Defines of Display Settings
@@ -140,7 +141,8 @@ public class AndroidSerialTerminal extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting");
-        menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Send to Email");
+        menu.add(Menu.NONE, MENU_ID_CLEARTEXT, Menu.NONE, "Clear Text");
+        menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Email to");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -150,6 +152,10 @@ public class AndroidSerialTerminal extends Activity {
 		case MENU_ID_SETTING :
 			startActivityForResult(new Intent().setClassName(this.getPackageName(),
 					AndroidSerialTerminalPrefActivity.class.getName()),REQUEST_PREFERENCE);
+			return true;
+		case MENU_ID_CLEARTEXT :
+			mText = "";
+			mTvSerial.setText(mText);
 			return true;
 		case MENU_ID_SENDTOEMAIL :
 			sendTextToEmail();
