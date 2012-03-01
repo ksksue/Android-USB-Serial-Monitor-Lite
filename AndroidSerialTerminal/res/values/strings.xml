@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">AndroidSerialTerminal</string>
+    <string name="button_write">Write</string>
     
     <string name="terminal_setting_header_title">Serial Settings</string>
     <string name="terminal_setting_header_summary"></string>

@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 public class AndroidSerialTerminal extends Activity {
 	private static final int TEXT_MAX_SIZE = 8192;
 	private static final int MENU_ID_SETTING = 0;
+	private static final int MENU_ID_SENDTOEMAIL = 1;
 	private static final int REQUEST_PREFERENCE = 0;
 
 	// Defines of Display Settings
@@ -137,6 +140,7 @@ public class AndroidSerialTerminal extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting");
+        menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Send to Email");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -146,6 +150,9 @@ public class AndroidSerialTerminal extends Activity {
 		case MENU_ID_SETTING :
 			startActivityForResult(new Intent().setClassName(this.getPackageName(),
 					AndroidSerialTerminalPrefActivity.class.getName()),REQUEST_PREFERENCE);
+			return true;
+		case MENU_ID_SENDTOEMAIL :
+			sendTextToEmail();
 			return true;
 		default :
 			return false;
@@ -348,7 +355,17 @@ public class AndroidSerialTerminal extends Activity {
         
         mSerial.setSerialPropertyToChip(FTDriver.CH_A);
 	}
+	
+    private void sendTextToEmail() {
+        String addr = "user@gmail.com";
+        Intent intent =
+                new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
+                        + addr));
 
+        intent.putExtra("body", mText);
+        startActivity(intent);
+    }
+    
 	// Load default baud rate
 	int loadDefaultBaudrate() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);

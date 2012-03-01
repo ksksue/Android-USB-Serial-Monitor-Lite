@@ -23,7 +23,7 @@
             android:id="@+id/btWrite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Write" />
+            android:text="@string/button_write" />
     </LinearLayout>
 
     <ScrollView
