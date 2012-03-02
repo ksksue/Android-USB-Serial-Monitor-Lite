@@ -35,6 +35,78 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 			
 			// show a Preference inner
 			addPreferencesFromResource(R.xml.pref_inner);
+			updateSummary();
+			
+		}
+		
+		private SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+			public void onSharedPreferenceChanged(
+					SharedPreferences sharedPreferences, String key) {
+
+				updateSummary();
+				
+				}
+		};
+
+		private void updateSummary() {
+			String summary;
+			
+			ListPreference lp = (ListPreference)getPreferenceScreen().findPreference("baudrate_list");
+			lp.setSummary(lp.getValue());
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("databits_list");
+			lp.setSummary(lp.getValue());
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("parity_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "None"; break;
+			case 1 : summary = "Odd"; break;
+			case 2 : summary = "Even"; break;
+			case 3 : summary = "Mark"; break;
+			case 4 : summary = "Space"; break;
+			default : summary = "none"; break;
+			}
+			lp.setSummary(summary);
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("stopbits_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "1"; break;
+			case 1 : summary = "1.5"; break;
+			case 2 : summary = "2"; break;
+			default : summary = "1"; break;
+			}
+			lp.setSummary(summary);
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("flowcontrol_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "None"; break;
+			case 1 : summary = "Rts/Cts"; break;
+			case 2 : summary = "Dtr/Dsr"; break;
+			case 3 : summary = "Xon"; break;
+			default : summary = "none"; break;
+			}
+			lp.setSummary(summary);
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("break_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "None"; break;
+			case 1 : summary = "Break"; break;
+			default : summary = "none"; break;
+			}
+			lp.setSummary(summary);
+		}
+		
+		@Override
+		public void onResume() {
+		    super.onResume();
+		    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+		}
+		 
+		@Override
+		public void onPause() {
+		    super.onPause();
+		    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
 		}
 	}
 
@@ -45,48 +117,57 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 			
 			// show a Preference inner
 			addPreferencesFromResource(R.xml.pref_disp_inner);
+			updateSummary();
+		}
+
+		private SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+			public void onSharedPreferenceChanged(
+					SharedPreferences sharedPreferences, String key) {
+
+				updateSummary();
+				
+				}
+		};
+
+		private void updateSummary() {
+			String summary;
+			
+			ListPreference lp = (ListPreference)getPreferenceScreen().findPreference("fontsize_list");
+			lp.setSummary(lp.getValue());
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("display_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "Char"; break;
+			case 1 : summary = "Dec"; break;
+			case 2 : summary = "Hex"; break;
+			default : summary = "None"; break;
+			}
+			lp.setSummary(summary);
+			
+			lp = (ListPreference)getPreferenceScreen().findPreference("linefeedcode_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "CR"; break;
+			case 1 : summary = "CR+LF"; break;
+			case 2 : summary = "LF"; break;
+			default : summary = "None"; break;
+			}
+			lp.setSummary(summary);
+			
+		}
+		
+		@Override
+		public void onResume() {
+		    super.onResume();
+		    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+		}
+		 
+		@Override
+		public void onPause() {
+		    super.onPause();
+		    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
 		}
 	}
 	
-	/*
-	 * @Override protected void onResume() { CharSequence cs =
-	 * getText(R.xml.pref_inner); ListPreference lp =
-	 * (ListPreference)getPreferenceScreen().findPreference("baudrate_list");
-	 * lp.setOnPreferenceChangeListener(new OnPreferenceChangeListener(){
-	 * 
-	 * @Override public boolean onPreferenceChange(
-	 * android.preference.Preference preference, Object newValue){ String
-	 * summary = ""; summary = font_normal_summary + newValue; ((ListPreference)
-	 * preference).setSummary(summary); return true; } }); super.onResume(); }
-	 */
-	private SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
-		public void onSharedPreferenceChanged(
-				SharedPreferences sharedPreferences, String key) {
-
-//			if (key.equals("baudrate_list"))
-//				searchbooksPref.setSummary(searchbooksMap.get(sharedPreferences
-//						.getString(key, "Books")));
-		}
-	};
-
-	/*	private SharedPreferences.OnSharedPreferenceChangeListener listener =   
-		    new SharedPreferences.OnSharedPreferenceChangeListener() {
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,String key) {
-		ListPreference lp = (ListPreference)findPreference(key);
-		lp.setSummary(lp.getValue());
-		}
-	};
-	*/
-	@Override
-	protected void onResume() {
-	    super.onResume();
-//	    getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
-	}
-	 
-	@Override
-	protected void onPause() {
-	    super.onPause();
-//	    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
-	}
 }
