@@ -44,9 +44,8 @@ public class AndroidSerialTerminal extends Activity {
 
 	private ScrollView mSvText;
 	private TextView mTvSerial;
-	private String mText;
+	private String mText="";
 	private boolean mStop=false;
-	private boolean mStopped=true;
 	
 	String TAG = "AndroidSerialTerminal";
     
@@ -65,6 +64,8 @@ public class AndroidSerialTerminal extends Activity {
     private int mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
     private int mBreak = FTDriver.FTDI_SET_NOBREAK;
 
+    private boolean mRunningMainLoop = false;
+    
     private static final String ACTION_USB_PERMISSION =
         "jp.ksksue.app.terminal.USB_PERMISSION";
     
@@ -84,7 +85,9 @@ public class AndroidSerialTerminal extends Activity {
         mSvText = (ScrollView) findViewById(R.id.svText);
         mTvSerial = (TextView) findViewById(R.id.tvSerial);
         btWrite = (Button) findViewById(R.id.btWrite);
+        btWrite.setEnabled(false);
         etWrite = (EditText) findViewById(R.id.etWrite);
+        etWrite.setEnabled(false);
         
         // get service
         mSerial = new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
@@ -235,6 +238,10 @@ public class AndroidSerialTerminal extends Activity {
     }
         
 	private void mainloop() {
+		mStop = false;
+		mRunningMainLoop = true;
+		btWrite.setEnabled(true);
+		etWrite.setEnabled(true);
 		new Thread(mLoop).start();
 	}
 	
@@ -244,7 +251,6 @@ public class AndroidSerialTerminal extends Activity {
 			int i;
 			int len;
 			byte[] rbuf = new byte[4096];
-			mText = "";
 			
 			for(;;){//this is the main loop for transferring
 				
@@ -321,7 +327,7 @@ public class AndroidSerialTerminal extends Activity {
 				}
 				
 				if(mStop) {
-					mStopped = true;
+					mRunningMainLoop = false;
 					return;
 				}
 			}
@@ -379,21 +385,45 @@ public class AndroidSerialTerminal extends Activity {
         return Integer.valueOf(res);
 	}
 	
+	protected void onNewIntent(Intent intent) {
+    	if(!mSerial.isConnected()) {
+    		mBaudrate = loadDefaultBaudrate();
+    		mSerial.begin(mBaudrate);
+    	}
+		if(!mRunningMainLoop) {
+			mainloop();
+		}
+	};
+	
     // BroadcastReceiver when insert/remove the device USB plug into/from a USB port  
     BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
     		String action = intent.getAction();
     		if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-    			mSerial.usbAttached(intent);
-    			mBaudrate = loadDefaultBaudrate();
-				mSerial.begin(mBaudrate);
-    			mainloop();
-				
+            	if(!mSerial.isConnected()) {
+            		mBaudrate = loadDefaultBaudrate();
+            		mSerial.begin(mBaudrate);
+            	}
+				if(!mRunningMainLoop) {
+					mainloop();
+				}
     		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+    			mStop = true;
+    			btWrite.setEnabled(false);
+    			etWrite.setEnabled(false);
     			mSerial.usbDetached(intent);
     			mSerial.end();
-    			mStop=true;
-    		}
+    		} else if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                	if(!mSerial.isConnected()) {
+                		mBaudrate = loadDefaultBaudrate();
+                		mSerial.begin(mBaudrate);
+                	}
+                }
+				if(!mRunningMainLoop) {
+					mainloop();
+				}
+            }
         }
     };
 }
