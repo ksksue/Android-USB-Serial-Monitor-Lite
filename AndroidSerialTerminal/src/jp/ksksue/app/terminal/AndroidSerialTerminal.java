@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AndroidSerialTerminal extends Activity {
 	private static final int TEXT_MAX_SIZE = 8192;
@@ -110,6 +111,8 @@ public class AndroidSerialTerminal extends Activity {
         	loadDefaultSettingValues();
         	mTvSerial.setTextSize(mTextFontSize);
         	mainloop();
+        } else {
+        	Toast.makeText(this, "no connection", Toast.LENGTH_SHORT).show();
         }
         
         // ---------------------------------------------------------------------------------------
@@ -242,6 +245,7 @@ public class AndroidSerialTerminal extends Activity {
 		mRunningMainLoop = true;
 		btWrite.setEnabled(true);
 		etWrite.setEnabled(true);
+		Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
 		new Thread(mLoop).start();
 	}
 	
@@ -369,7 +373,7 @@ public class AndroidSerialTerminal extends Activity {
 	}
 	
     private void sendTextToEmail() {
-        String addr = "user@gmail.com";
+        String addr = "@gmail.com";
         Intent intent =
                 new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
                         + addr));
@@ -395,6 +399,12 @@ public class AndroidSerialTerminal extends Activity {
 		}
 	};
 	
+	private void detachedUi(){
+		btWrite.setEnabled(false);
+		etWrite.setEnabled(false);
+    	Toast.makeText(this, "disconnect", Toast.LENGTH_SHORT).show();
+	}
+	
     // BroadcastReceiver when insert/remove the device USB plug into/from a USB port  
     BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -409,8 +419,7 @@ public class AndroidSerialTerminal extends Activity {
 				}
     		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
     			mStop = true;
-    			btWrite.setEnabled(false);
-    			etWrite.setEnabled(false);
+    			detachedUi();
     			mSerial.usbDetached(intent);
     			mSerial.end();
     		} else if (ACTION_USB_PERMISSION.equals(action)) {
