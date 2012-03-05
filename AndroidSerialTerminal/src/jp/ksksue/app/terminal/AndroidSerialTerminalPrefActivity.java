@@ -7,6 +7,7 @@ import java.util.Map;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -95,6 +96,7 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 			default : summary = "none"; break;
 			}
 			lp.setSummary(summary);
+			
 		}
 		
 		@Override
@@ -153,7 +155,9 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 			default : summary = "None"; break;
 			}
 			lp.setSummary(summary);
-			
+
+			EditTextPreference etp = (EditTextPreference)getPreferenceScreen().findPreference("email_edittext");
+			etp.setSummary(etp.getText());
 		}
 		
 		@Override

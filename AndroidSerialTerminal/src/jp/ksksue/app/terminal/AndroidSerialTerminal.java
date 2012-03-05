@@ -64,7 +64,8 @@ public class AndroidSerialTerminal extends Activity {
     private int mStopBits = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
     private int mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
     private int mBreak = FTDriver.FTDI_SET_NOBREAK;
-
+    private String mEmailAddress;
+    
     private boolean mRunningMainLoop = false;
     
     private static final String ACTION_USB_PERMISSION =
@@ -187,6 +188,9 @@ public class AndroidSerialTerminal extends Activity {
 	        
 	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
 	        mLinefeedCode = Integer.valueOf(res);
+	        
+	        res = pref.getString("email_edittext", "@gmail.com");
+	        mEmailAddress = res;
 
 	        res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
 	        if(mDataBits != Integer.valueOf(res)) {
@@ -348,6 +352,9 @@ public class AndroidSerialTerminal extends Activity {
         
         res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
         mLinefeedCode = Integer.valueOf(res);
+        
+        res = pref.getString("email_edittext", "@gmail.com");
+        mEmailAddress = res;
 
         res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
         mDataBits = Integer.valueOf(res);
@@ -373,10 +380,9 @@ public class AndroidSerialTerminal extends Activity {
 	}
 	
     private void sendTextToEmail() {
-        String addr = "@gmail.com";
         Intent intent =
                 new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
-                        + addr));
+                        + mEmailAddress));
 
         intent.putExtra("body", mText);
         startActivity(intent);

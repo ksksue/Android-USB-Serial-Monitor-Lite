@@ -22,6 +22,10 @@
     <string name="linefeedcode_title">Linefeed Code</string>
     <string name="linefeedcode_summary">Choose CR or LF, CR/LF</string>
     
+    <string name="email_setting_title">Email Setting</string>
+    <string name="email_title">email</string>
+    <string name="email_summary"></string>
+    
     <string name="serial_setting_title">Serial Setting</string>
     
     <string name="baudrate_title">Baudrate</string>

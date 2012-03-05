@@ -31,4 +31,12 @@
 		/>
 	</PreferenceCategory>
 	
+	<PreferenceCategory android:title="@string/email_setting_title">
+		<EditTextPreference
+		    android:key="email_edittext"
+		    android:title="@string/email_title"
+		    android:summary="@string/email_summary"
+		    android:inputType="textEmailAddress"
+		/>
+	</PreferenceCategory>
 </PreferenceScreen>
