@@ -64,7 +64,7 @@ public class AndroidSerialTerminal extends Activity {
     private int mStopBits = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
     private int mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
     private int mBreak = FTDriver.FTDI_SET_NOBREAK;
-    private String mEmailAddress;
+    private String mEmailAddress = "@gmail.com";
     
     private boolean mRunningMainLoop = false;
     

@@ -1,10 +1,14 @@
-Serial Terminal for Android
+USB Serial Terminal for Android
 =====
 
 USB Serial Terminal for Android
 
 - char, dec, hex display setting
-- baud rate setting
+- baud rate and data bits, parity, stop bits, flow control, break setting
+- linefeed code setting
+- email result to your address
+
+require the FTDriver library project
 
 About me
 ---
