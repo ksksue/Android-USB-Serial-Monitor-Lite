@@ -419,6 +419,8 @@ public class AndroidSerialTerminal extends Activity {
             	if(!mSerial.isConnected()) {
             		mBaudrate = loadDefaultBaudrate();
             		mSerial.begin(mBaudrate);
+                	loadDefaultSettingValues();
+                	mTvSerial.setTextSize(mTextFontSize);
             	}
 				if(!mRunningMainLoop) {
 					mainloop();
@@ -433,6 +435,8 @@ public class AndroidSerialTerminal extends Activity {
                 	if(!mSerial.isConnected()) {
                 		mBaudrate = loadDefaultBaudrate();
                 		mSerial.begin(mBaudrate);
+                    	loadDefaultSettingValues();
+                    	mTvSerial.setTextSize(mTextFontSize);
                 	}
                 }
 				if(!mRunningMainLoop) {
