@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class AndroidSerialTerminal extends Activity {
+	// occurs USB packet loss if TEXT_MAX_SIZE is over 6000
 	private static final int TEXT_MAX_SIZE = 8192;
 	private static final int MENU_ID_SETTING = 0;
 	private static final int MENU_ID_CLEARTEXT = 1;
@@ -45,7 +46,7 @@ public class AndroidSerialTerminal extends Activity {
 
 	private ScrollView mSvText;
 	private TextView mTvSerial;
-	private String mText="";
+	private StringBuilder mText = new StringBuilder();
 	private boolean mStop=false;
 	
 	String TAG = "AndroidSerialTerminal";
@@ -161,8 +162,8 @@ public class AndroidSerialTerminal extends Activity {
 					AndroidSerialTerminalPrefActivity.class.getName()),REQUEST_PREFERENCE);
 			return true;
 		case MENU_ID_CLEARTEXT :
-			mText = "";
-			mTvSerial.setText(mText);
+			mTvSerial.setText("");
+			mText.setLength(0);
 			return true;
 		case MENU_ID_SENDTOEMAIL :
 			sendTextToEmail();
@@ -270,10 +271,8 @@ public class AndroidSerialTerminal extends Activity {
 				// TODO: UI:Show last line
 				if(len > 0) {
 					if(SHOW_LOGCAT) { Log.i(TAG,"Read  Length : "+len); }
-//					mText = (String) mTvSerial.getText();
-					if(mText.length() > TEXT_MAX_SIZE) {
-						mText = mText.substring(mText.length()-TEXT_MAX_SIZE);
-					}
+					
+					
 					for(i=0;i<len;++i) {
 						if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 						// TODO: change the output type from UI
@@ -281,48 +280,63 @@ public class AndroidSerialTerminal extends Activity {
 						case DISP_CHAR : 
 							// "\r":CR(0x0D) "\n":LF(0x0A)
 							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText = mText + BR;
+								mText.append(BR);
 								++i;
 							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
-								mText = mText + BR;
+								mText.append(BR);
 							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText = mText + BR;
+								mText.append(BR);
 							} else {
-								mText = mText + "" +(char)rbuf[i];
+								mText.append((char)rbuf[i]);
 							}
 							break;
 						case DISP_DEC :
 							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + " " + Byte.toString(rbuf[i+1]) + BR;
+								mText.append("13 10");
+								mText.append(BR);
 								++i;
 							} else if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
+								mText.append(" 13");
+								mText.append(BR);
 							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText = mText + " " + Byte.toString(rbuf[i]) + BR;
+								mText.append(" 10");
+								mText.append(BR);
 							} else {
-								mText = mText + " " + Byte.toString(rbuf[i]);
+								mText.append(" ");
+								mText.append(rbuf[i]);
 							}							
 							break;
 						case DISP_HEX :
 							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + " " + Integer.toHexString((int) rbuf[i+1]) + BR;
+								mText.append(" 0d 0a");
+								mText.append(BR);
 								++i;
 							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
 								// TODO: output 2 length character (now not "0D", it's only "D".)
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
+								mText.append(" 0d");
+								mText.append(BR);
 							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText = mText + " " + Integer.toHexString((int) rbuf[i]) + BR;
+								mText.append(" 0a");
+								mText.append(BR);
 							} else {
-								mText = mText + " "
-										+ Integer.toHexString((int) rbuf[i]);
-							}							
+								mText.append(" ");
+								mText.append(Integer.toHexString((int) rbuf[i]));
+							}
 							break;
 						}
 					}
 
 					mHandler.post(new Runnable() {
 						public void run() {
-							mTvSerial.setText(mText);
+							if(mTvSerial.length() > TEXT_MAX_SIZE) {
+								int clearLength = mTvSerial.length() - TEXT_MAX_SIZE;
+								StringBuilder sb = new StringBuilder();
+								sb.append(mTvSerial.getText());
+								sb.delete(0, TEXT_MAX_SIZE/2);
+								mTvSerial.setText(sb);
+							}
+							mTvSerial.append(mText);
+							mText.setLength(0);
 							mSvText.fullScroll(ScrollView.FOCUS_DOWN);
 						}
 					});
@@ -384,7 +398,7 @@ public class AndroidSerialTerminal extends Activity {
                 new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
                         + mEmailAddress));
 
-        intent.putExtra("body", mText);
+        intent.putExtra("body", mText.toString());
         startActivity(intent);
     }
     
