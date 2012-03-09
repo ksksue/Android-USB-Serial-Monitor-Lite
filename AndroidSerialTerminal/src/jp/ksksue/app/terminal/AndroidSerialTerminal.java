@@ -267,65 +267,25 @@ public class AndroidSerialTerminal extends Activity {
 				// Read and Display to Terminal
 				//////////////////////////////////////////////////////////
 				len = mSerial.read(rbuf);
-
+				rbuf[len] = 0;
+				
 				// TODO: UI:Show last line
 				if(len > 0) {
 					if(SHOW_LOGCAT) { Log.i(TAG,"Read  Length : "+len); }
-					
-					
-					for(i=0;i<len;++i) {
-						if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
-						// TODO: change the output type from UI
-						switch(mDisplayType) {
-						case DISP_CHAR : 
-							// "\r":CR(0x0D) "\n":LF(0x0A)
-							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText.append(BR);
-								++i;
-							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
-								mText.append(BR);
-							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText.append(BR);
-							} else {
-								mText.append((char)rbuf[i]);
-							}
-							break;
-						case DISP_DEC :
-							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText.append("13 10");
-								mText.append(BR);
-								++i;
-							} else if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
-								mText.append(" 13");
-								mText.append(BR);
-							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText.append(" 10");
-								mText.append(BR);
-							} else {
-								mText.append(" ");
-								mText.append(rbuf[i]);
-							}							
-							break;
-						case DISP_HEX :
-							if((mLinefeedCode==LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
-								mText.append(" 0d 0a");
-								mText.append(BR);
-								++i;
-							} else	if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
-								// TODO: output 2 length character (now not "0D", it's only "D".)
-								mText.append(" 0d");
-								mText.append(BR);
-							} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
-								mText.append(" 0a");
-								mText.append(BR);
-							} else {
-								mText.append(" ");
-								mText.append(Integer.toHexString((int) rbuf[i]));
-							}
-							break;
-						}
-					}
 
+					// TODO: change the output type from UI
+					switch(mDisplayType) {
+					case DISP_CHAR :
+						aa(mDisplayType, rbuf, len, "", "");
+						break;
+					case DISP_DEC :
+						aa(mDisplayType, rbuf, len, " 13", " 10");
+						break;
+					case DISP_HEX :
+						aa(mDisplayType, rbuf, len, " 0d", " 0a");
+						break;
+					}
+						
 					mHandler.post(new Runnable() {
 						public void run() {
 							if(mTvSerial.length() > TEXT_MAX_SIZE) {
@@ -356,6 +316,67 @@ public class AndroidSerialTerminal extends Activity {
 		}
 	};
 
+	boolean lastDataIs0x0D = false;
+	void aa(int disp, byte[] rbuf, int len, String sCr, String sLf) {
+		for(int i=0;i<len;++i) {
+			if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
+			
+			// "\r":CR(0x0D) "\n":LF(0x0A)
+			if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
+				mText.append(sCr);
+				mText.append(BR);
+			} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
+				mText.append(sLf);
+				mText.append(BR);
+			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
+				mText.append(sCr);
+				mText.append(sLf);
+				mText.append(BR);
+				++i;
+			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D)) {
+				mText.append(sCr);
+				lastDataIs0x0D = true;
+			} else if( lastDataIs0x0D && (rbuf[0] == 0x0A)) {
+				mText.append(sLf);
+				mText.append(BR);
+				lastDataIs0x0D = false;
+			} else if( lastDataIs0x0D && (i != 0)) {
+				switch (disp) {
+				case DISP_CHAR:
+					mText.append((char)rbuf[i]);
+					break;
+				case DISP_DEC:
+					mText.append((int)rbuf[i]);
+					mText.append(" ");
+					break;
+				case DISP_HEX:
+					mText.append(Integer.toHexString((int)rbuf[i]));
+					mText.append(" ");
+					break;
+				default :
+					break;
+				}
+				lastDataIs0x0D = false;
+			} else {
+				switch (disp) {
+				case DISP_CHAR:
+					mText.append((char)rbuf[i]);
+					break;
+				case DISP_DEC:
+					mText.append((int)rbuf[i]);
+					mText.append(" ");
+					break;
+				case DISP_HEX:
+					mText.append(Integer.toHexString((int)rbuf[i]));
+					mText.append(" ");
+					break;
+				default :
+					break;
+				}
+			}
+		}
+	}
+	
 	void loadDefaultSettingValues() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String res = pref.getString("display_list", Integer.toString(DISP_CHAR));
