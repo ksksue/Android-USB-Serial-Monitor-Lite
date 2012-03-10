@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Android USB Serial Terminal</string>
+    <string name="app_name">Android USB Serial Monitor Lite</string>
     <string name="button_write">Write</string>
     
     <string name="terminal_setting_header_title">Serial Settings</string>
