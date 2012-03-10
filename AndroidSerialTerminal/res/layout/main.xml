@@ -6,15 +6,16 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom|left|right"
         android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/etWrite"
-            android:layout_width="1041dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
 
             <requestFocus />
         </EditText>

@@ -34,12 +34,23 @@
     </string-array>
     
     
-    <string-array name="linefeedcode_entries">
+    <string-array name="readlinefeedcode_entries">
         <item >CR</item>
         <item >CR+LF</item>
         <item >LF</item>
     </string-array>
-    <string-array name="linefeedcode_entryvalues">
+    <string-array name="readlinefeedcode_entryvalues">
+        <item >0</item>
+        <item >1</item>
+        <item >2</item>
+    </string-array>
+    
+    <string-array name="writelinefeedcode_entries">
+        <item >CR</item>
+        <item >CR+LF</item>
+        <item >LF</item>
+    </string-array>
+    <string-array name="writelinefeedcode_entryvalues">
         <item >0</item>
         <item >1</item>
         <item >2</item>

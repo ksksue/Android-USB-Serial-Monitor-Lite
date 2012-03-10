@@ -147,7 +147,16 @@ public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
 			}
 			lp.setSummary(summary);
 			
-			lp = (ListPreference)getPreferenceScreen().findPreference("linefeedcode_list");
+			lp = (ListPreference)getPreferenceScreen().findPreference("readlinefeedcode_list");
+			switch(Integer.valueOf(lp.getValue())) {
+			case 0 : summary = "CR"; break;
+			case 1 : summary = "CR+LF"; break;
+			case 2 : summary = "LF"; break;
+			default : summary = "None"; break;
+			}
+			lp.setSummary(summary);
+
+			lp = (ListPreference)getPreferenceScreen().findPreference("writelinefeedcode_list");
 			switch(Integer.valueOf(lp.getValue())) {
 			case 0 : summary = "CR"; break;
 			case 1 : summary = "CR+LF"; break;

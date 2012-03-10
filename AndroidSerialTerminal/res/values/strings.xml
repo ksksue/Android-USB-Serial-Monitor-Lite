@@ -19,8 +19,10 @@
     <string name="display_summary">Choose char or dec, hex</string>
     
     <string name="linefeedcode_setting_title">Linefeed Code Setting</string>
-    <string name="linefeedcode_title">Linefeed Code</string>
-    <string name="linefeedcode_summary">Choose CR or LF, CR/LF</string>
+    <string name="readlinefeedcode_title">Read Linefeed Code</string>
+    <string name="readlinefeedcode_summary">Choose CR or LF, CR/LF</string>
+    <string name="writelinefeedcode_title">Write Linefeed Code</string>
+    <string name="writelinefeedcode_summary">Choose CR or LF, CR/LF</string>
     
     <string name="email_setting_title">Email Setting</string>
     <string name="email_title">email</string>

@@ -61,7 +61,8 @@ public class AndroidSerialTerminal extends Activity {
     
     private int mTextFontSize = 12;
     private int mDisplayType = DISP_CHAR;
-    private int mLinefeedCode = LINEFEED_CODE_CRLF;
+    private int mReadLinefeedCode = LINEFEED_CODE_CRLF;
+    private int mWriteLinefeedCode = LINEFEED_CODE_CRLF;
     private int mBaudrate = FTDriver.BAUD9600;
     private int mDataBits = FTDriver.FTDI_SET_DATA_BITS_8;
     private int mParity = FTDriver.FTDI_SET_DATA_PARITY_NONE;
@@ -128,6 +129,7 @@ public class AndroidSerialTerminal extends Activity {
 				@Override
 				public void onClick(View v) {
 					String strWrite = etWrite.getText().toString();
+					strWrite = changeLinefeedcode(strWrite);
 					mSerial.write(strWrite.getBytes(), strWrite.length());
 				}
 			});
@@ -144,6 +146,20 @@ public class AndroidSerialTerminal extends Activity {
 				}
 			});
 		} // end of if(SHOW_WRITE_TEST_BUTTON)
+    }
+
+    private String changeLinefeedcode(String str){
+    	switch(mWriteLinefeedCode) {
+    	case LINEFEED_CODE_CR :
+    		str = str.replace(BR, "\r");
+    		break;
+    	case LINEFEED_CODE_CRLF :
+    		str = str.replace(BR, "\r\n");
+    		break;
+    	// case LINEFEED_CODE_LF :
+    	default :
+    	}
+    	return str;
     }
     
     // ---------------------------------------------------------------------------------------
@@ -190,9 +206,12 @@ public class AndroidSerialTerminal extends Activity {
 	        mTextFontSize = Integer.valueOf(res);
 	        mTvSerial.setTextSize(mTextFontSize);
 	        
-	        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
-	        mLinefeedCode = Integer.valueOf(res);
+	        res = pref.getString("readlinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+	        mReadLinefeedCode = Integer.valueOf(res);
 	        
+	        res = pref.getString("writelinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+	        mWriteLinefeedCode = Integer.valueOf(res);
+
 	        res = pref.getString("email_edittext", "@gmail.com");
 	        mEmailAddress = res;
 
@@ -344,13 +363,13 @@ public class AndroidSerialTerminal extends Activity {
 			if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 			
 			// "\r":CR(0x0D) "\n":LF(0x0A)
-			if ((mLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
+			if ((mReadLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
 				mText.append(sCr);
 				mText.append(BR);
-			} else if ((mLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
+			} else if ((mReadLinefeedCode == LINEFEED_CODE_LF) && (rbuf[i] == 0x0A)) {
 				mText.append(sLf);
 				mText.append(BR);
-			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
+			} else if((mReadLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
 				mText.append(sCr);
 				if(disp != DISP_CHAR) {
 					mText.append(" ");
@@ -358,7 +377,7 @@ public class AndroidSerialTerminal extends Activity {
 				mText.append(sLf);
 				mText.append(BR);
 				++i;
-			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D)) {
+			} else if((mReadLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D)) {
 				// case of rbuf[last] == 0x0D and rbuf[0] == 0x0A
 				mText.append(sCr);
 				lastDataIs0x0D = true;
@@ -404,9 +423,12 @@ public class AndroidSerialTerminal extends Activity {
         res = pref.getString("fontsize_list", Integer.toString(12));
         mTextFontSize = Integer.valueOf(res);
         
-        res = pref.getString("linefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
-        mLinefeedCode = Integer.valueOf(res);
+        res = pref.getString("readlinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+        mReadLinefeedCode = Integer.valueOf(res);
         
+        res = pref.getString("writelinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
+        mWriteLinefeedCode = Integer.valueOf(res);
+
         res = pref.getString("email_edittext", "@gmail.com");
         mEmailAddress = res;
 
