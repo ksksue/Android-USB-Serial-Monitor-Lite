@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class AndroidSerialTerminal extends Activity {
+
 	// occurs USB packet loss if TEXT_MAX_SIZE is over 6000
 	private static final int TEXT_MAX_SIZE = 8192;
 	private static final int MENU_ID_SETTING = 0;
@@ -41,6 +41,9 @@ public class AndroidSerialTerminal extends Activity {
 	private static final int LINEFEED_CODE_CR		= 0;
 	private static final int LINEFEED_CODE_CRLF	= 1;
 	private static final int LINEFEED_CODE_LF		= 2;
+	
+	// Load Bundle Key (for view switching)
+	private static final String BUNDLEKEY_LOADTEXTVIEW = "bundlekey.LoadTextView";
 	
 	FTDriver mSerial;
 
@@ -236,6 +239,27 @@ public class AndroidSerialTerminal extends Activity {
 	    }
 	}
     // ---------------------------------------------------------------------------------------
+	// End of Menu button
+    // ---------------------------------------------------------------------------------------
+	
+	/**
+	 * Saves values for view switching
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(BUNDLEKEY_LOADTEXTVIEW, mTvSerial.getText().toString());
+	}
+
+	/**
+	 * Loads values for view switching
+	 */
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		mTvSerial.setText(savedInstanceState.getString(BUNDLEKEY_LOADTEXTVIEW));
+	}
 	
     @Override
     public void onDestroy() {
@@ -244,7 +268,7 @@ public class AndroidSerialTerminal extends Activity {
        unregisterReceiver(mUsbReceiver);
 		super.onDestroy();
     }
-        
+    
 	private void mainloop() {
 		mStop = false;
 		mRunningMainLoop = true;
@@ -269,20 +293,18 @@ public class AndroidSerialTerminal extends Activity {
 				len = mSerial.read(rbuf);
 				rbuf[len] = 0;
 				
-				// TODO: UI:Show last line
 				if(len > 0) {
 					if(SHOW_LOGCAT) { Log.i(TAG,"Read  Length : "+len); }
 
-					// TODO: change the output type from UI
 					switch(mDisplayType) {
 					case DISP_CHAR :
-						aa(mDisplayType, rbuf, len, "", "");
+						setSerialDataToTextView(mDisplayType, rbuf, len, "", "");
 						break;
 					case DISP_DEC :
-						aa(mDisplayType, rbuf, len, " 13", " 10");
+						setSerialDataToTextView(mDisplayType, rbuf, len, "13", "10");
 						break;
 					case DISP_HEX :
-						aa(mDisplayType, rbuf, len, " 0d", " 0a");
+						setSerialDataToTextView(mDisplayType, rbuf, len, "0d", "0a");
 						break;
 					}
 						
@@ -317,7 +339,7 @@ public class AndroidSerialTerminal extends Activity {
 	};
 
 	boolean lastDataIs0x0D = false;
-	void aa(int disp, byte[] rbuf, int len, String sCr, String sLf) {
+	void setSerialDataToTextView(int disp, byte[] rbuf, int len, String sCr, String sLf) {
 		for(int i=0;i<len;++i) {
 			if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 			
@@ -330,33 +352,27 @@ public class AndroidSerialTerminal extends Activity {
 				mText.append(BR);
 			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D) && (rbuf[i+1] == 0x0A)) {
 				mText.append(sCr);
+				if(disp != DISP_CHAR) {
+					mText.append(" ");
+				}
 				mText.append(sLf);
 				mText.append(BR);
 				++i;
 			} else if((mLinefeedCode == LINEFEED_CODE_CRLF) && (rbuf[i] == 0x0D)) {
+				// case of rbuf[last] == 0x0D and rbuf[0] == 0x0A
 				mText.append(sCr);
 				lastDataIs0x0D = true;
 			} else if( lastDataIs0x0D && (rbuf[0] == 0x0A)) {
+				if(disp != DISP_CHAR) {
+					mText.append(" ");
+				}
 				mText.append(sLf);
 				mText.append(BR);
 				lastDataIs0x0D = false;
 			} else if( lastDataIs0x0D && (i != 0)) {
-				switch (disp) {
-				case DISP_CHAR:
-					mText.append((char)rbuf[i]);
-					break;
-				case DISP_DEC:
-					mText.append((int)rbuf[i]);
-					mText.append(" ");
-					break;
-				case DISP_HEX:
-					mText.append(Integer.toHexString((int)rbuf[i]));
-					mText.append(" ");
-					break;
-				default :
-					break;
-				}
+				// only disable flag
 				lastDataIs0x0D = false;
+				--i;
 			} else {
 				switch (disp) {
 				case DISP_CHAR:
@@ -367,6 +383,9 @@ public class AndroidSerialTerminal extends Activity {
 					mText.append(" ");
 					break;
 				case DISP_HEX:
+					if(Byte.valueOf(rbuf[i]) < 0x10) {
+						mText.append(0);
+					}
 					mText.append(Integer.toHexString((int)rbuf[i]));
 					mText.append(" ");
 					break;
@@ -419,7 +438,8 @@ public class AndroidSerialTerminal extends Activity {
                 new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
                         + mEmailAddress));
 
-        intent.putExtra("body", mText.toString());
+        intent.putExtra("subject", "Result of Androud USB Serial Terminal");
+        intent.putExtra("body", mTvSerial.getText().toString().trim());
         startActivity(intent);
     }
     
