@@ -23,7 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AndroidSerialTerminal extends Activity {
+public class AndroidUSBSerialMonitorLite extends Activity {
 
 	// occurs USB packet loss if TEXT_MAX_SIZE is over 6000
 	private static final int TEXT_MAX_SIZE = 8192;
@@ -178,7 +178,7 @@ public class AndroidSerialTerminal extends Activity {
 		switch (item.getItemId()) {
 		case MENU_ID_SETTING :
 			startActivityForResult(new Intent().setClassName(this.getPackageName(),
-					AndroidSerialTerminalPrefActivity.class.getName()),REQUEST_PREFERENCE);
+					AndroidUSBSerialMonitorLitePrefActivity.class.getName()),REQUEST_PREFERENCE);
 			return true;
 		case MENU_ID_CLEARTEXT :
 			mTvSerial.setText("");

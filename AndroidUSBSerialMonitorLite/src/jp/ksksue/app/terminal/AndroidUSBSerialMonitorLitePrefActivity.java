@@ -12,7 +12,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
-public class AndroidSerialTerminalPrefActivity extends PreferenceActivity {
+public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity {
 	final static String BAUDRATE_KEY = "baudrate_list";  
 	  
 	Map<String, String> baudrateMap = new HashMap<String, String>();  
