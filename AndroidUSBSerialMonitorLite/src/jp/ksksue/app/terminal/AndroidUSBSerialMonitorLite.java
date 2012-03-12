@@ -460,7 +460,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"
                         + mEmailAddress));
 
-        intent.putExtra("subject", "Result of Androud USB Serial Terminal");
+        intent.putExtra("subject", "Result of " + getString(R.string.app_name));
         intent.putExtra("body", mTvSerial.getText().toString().trim());
         startActivity(intent);
     }
