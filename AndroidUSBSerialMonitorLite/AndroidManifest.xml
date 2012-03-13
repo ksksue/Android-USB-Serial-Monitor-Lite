@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.ksksue.app.terminal"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="1.0.0" >
 
     <uses-sdk android:minSdkVersion="13" />
+    <uses-feature android:name="android.hardware.usb.host" />
 
     <application
         android:icon="@drawable/terminal"
