@@ -14,9 +14,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -95,6 +97,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         btWrite.setEnabled(false);
         etWrite = (EditText) findViewById(R.id.etWrite);
         etWrite.setEnabled(false);
+//        etWrite.setHint("CR : \\r, LF : \\n");
         
         // get service
         mSerial = new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
@@ -121,6 +124,17 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         	Toast.makeText(this, "no connection", Toast.LENGTH_SHORT).show();
         }
         
+		etWrite.setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+	               if (event.getAction() == KeyEvent.ACTION_UP
+	            		   && keyCode == KeyEvent.KEYCODE_ENTER) {
+	            	   writeDataToSerial();
+	            	   return true;
+	               }
+	               return false;
+			}
+		});
         // ---------------------------------------------------------------------------------------
        // Write Button
         // ---------------------------------------------------------------------------------------
@@ -128,9 +142,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 			btWrite.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					String strWrite = etWrite.getText().toString();
-					strWrite = changeLinefeedcode(strWrite);
-					mSerial.write(strWrite.getBytes(), strWrite.length());
+					writeDataToSerial();
 				}
 			});
 		} else {
@@ -148,15 +160,25 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 		} // end of if(SHOW_WRITE_TEST_BUTTON)
     }
 
+	private void writeDataToSerial() {
+		String strWrite = etWrite.getText().toString();
+		strWrite = changeLinefeedcode(strWrite);
+		mSerial.write(strWrite.getBytes(), strWrite.length());
+	}
+
     private String changeLinefeedcode(String str){
+    	str = str.replace("\\r", "\r");
+    	str = str.replace("\\n", "\n");
     	switch(mWriteLinefeedCode) {
     	case LINEFEED_CODE_CR :
-    		str = str.replace(BR, "\r");
+    		str = str + "\r";
     		break;
     	case LINEFEED_CODE_CRLF :
-    		str = str.replace(BR, "\r\n");
+    		str = str + "\r\n";
     		break;
-    	// case LINEFEED_CODE_LF :
+    	case LINEFEED_CODE_LF :
+    		str = str + "\n";
+    		break;
     	default :
     	}
     	return str;

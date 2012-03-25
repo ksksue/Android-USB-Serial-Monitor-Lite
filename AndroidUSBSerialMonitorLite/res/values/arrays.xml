@@ -38,22 +38,26 @@
         <item >CR</item>
         <item >CR+LF</item>
         <item >LF</item>
+        <item >NONE</item>
     </string-array>
     <string-array name="readlinefeedcode_entryvalues">
         <item >0</item>
         <item >1</item>
         <item >2</item>
+        <item >3</item>
     </string-array>
     
     <string-array name="writelinefeedcode_entries">
         <item >CR</item>
         <item >CR+LF</item>
         <item >LF</item>
+        <item >NONE</item>
     </string-array>
     <string-array name="writelinefeedcode_entryvalues">
         <item >0</item>
         <item >1</item>
         <item >2</item>
+        <item >3</item>
     </string-array>
     
     
