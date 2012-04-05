@@ -63,8 +63,8 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     
     private int mTextFontSize = 12;
     private int mDisplayType = DISP_CHAR;
-    private int mReadLinefeedCode = LINEFEED_CODE_CRLF;
-    private int mWriteLinefeedCode = LINEFEED_CODE_CRLF;
+    private int mReadLinefeedCode = LINEFEED_CODE_LF;
+    private int mWriteLinefeedCode = LINEFEED_CODE_LF;
     private int mBaudrate = FTDriver.BAUD9600;
     private int mDataBits = FTDriver.FTDI_SET_DATA_BITS_8;
     private int mParity = FTDriver.FTDI_SET_DATA_PARITY_NONE;
