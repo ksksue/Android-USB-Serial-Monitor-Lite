@@ -342,7 +342,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 						setSerialDataToTextView(mDisplayType, rbuf, len, "", "");
 						break;
 					case DISP_DEC :
-						setSerialDataToTextView(mDisplayType, rbuf, len, "13", "10");
+						setSerialDataToTextView(mDisplayType, rbuf, len, "013", "010");
 						break;
 					case DISP_HEX :
 						setSerialDataToTextView(mDisplayType, rbuf, len, "0d", "0a");
@@ -378,9 +378,17 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 			}
 		}
 	};
-
+	
+	private String IntToHex2(int Value) {
+	    char HEX2[]= {Character.forDigit((Value>>4) & 0x0F,16),
+	    Character.forDigit(Value & 0x0F,16)};
+	    String Hex2Str = new String(HEX2);
+	    return Hex2Str;
+	}
+	
 	boolean lastDataIs0x0D = false;
 	void setSerialDataToTextView(int disp, byte[] rbuf, int len, String sCr, String sLf) {
+		int tmpbuf;
 		for(int i=0;i<len;++i) {
 			if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 			
@@ -420,14 +428,15 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 					mText.append((char)rbuf[i]);
 					break;
 				case DISP_DEC:
-					mText.append((int)rbuf[i]);
+					tmpbuf = rbuf[i];
+					if(tmpbuf < 0) {
+						tmpbuf += 256;
+					}
+					mText.append(String.format("%1$03d", tmpbuf));
 					mText.append(" ");
 					break;
 				case DISP_HEX:
-					if(Byte.valueOf(rbuf[i]) < 0x10) {
-						mText.append(0);
-					}
-					mText.append(Integer.toHexString((int)rbuf[i]));
+					mText.append(IntToHex2((int)rbuf[i]));
 					mText.append(" ");
 					break;
 				default :
