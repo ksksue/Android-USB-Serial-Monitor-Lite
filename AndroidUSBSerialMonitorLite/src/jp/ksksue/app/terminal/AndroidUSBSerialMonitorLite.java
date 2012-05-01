@@ -26,6 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class AndroidUSBSerialMonitorLite extends Activity {
+	// debug settings
+	private static final boolean SHOW_DEBUG = false;
+	private static final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
 
 	// occurs USB packet loss if TEXT_MAX_SIZE is over 6000
 	private static final int TEXT_MAX_SIZE = 8192;
@@ -81,10 +84,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     // Linefeed
     private final static String BR = System.getProperty("line.separator");
     
-	// debug settings
-	final boolean SHOW_LOGCAT = false;
-	final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
-
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,9 +98,12 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         etWrite.setEnabled(false);
 //        etWrite.setHint("CR : \\r, LF : \\n");
         
+        if(SHOW_DEBUG) { Log.d(TAG,"New FTDriver"); }
+        
         // get service
         mSerial = new FTDriver((UsbManager)getSystemService(Context.USB_SERVICE));
           
+        if(SHOW_DEBUG) { Log.d(TAG,"New instance : " + mSerial); }
         // listen for new devices
         IntentFilter filter = new IntentFilter();
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -116,11 +118,15 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
         mSerial.setPermissionIntent(permissionIntent);
         
+        if(SHOW_DEBUG) { Log.d(TAG,"FTDriver beginning"); }
+
         if(mSerial.begin(mBaudrate)) {
+        	if(SHOW_DEBUG) { Log.d(TAG,"FTDriver began"); }
         	loadDefaultSettingValues();
         	mTvSerial.setTextSize(mTextFontSize);
         	mainloop();
         } else {
+        	if(SHOW_DEBUG) { Log.d(TAG,"FTDriver no connection"); }
         	Toast.makeText(this, "no connection", Toast.LENGTH_SHORT).show();
         }
         
@@ -154,6 +160,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 					for (int i = 0; i < 3000; ++i) {
 						strWrite = strWrite + " " + Integer.toString(i);
 					}
+			        if(SHOW_DEBUG) { Log.d(TAG,"FTDriver Write(" + strWrite.length() + ") : " + strWrite); }
 					mSerial.write(strWrite.getBytes(), strWrite.length());
 				}
 			});
@@ -163,6 +170,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 	private void writeDataToSerial() {
 		String strWrite = etWrite.getText().toString();
 		strWrite = changeLinefeedcode(strWrite);
+		if(SHOW_DEBUG) { Log.d(TAG,"FTDriver Write(" + strWrite.length() + ") : " + strWrite); }
 		mSerial.write(strWrite.getBytes(), strWrite.length());
 	}
 
@@ -316,6 +324,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 		btWrite.setEnabled(true);
 		etWrite.setEnabled(true);
 		Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
+		if(SHOW_DEBUG) { Log.d(TAG,"start mainloop"); }
 		new Thread(mLoop).start();
 	}
 	
@@ -335,7 +344,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 				rbuf[len] = 0;
 				
 				if(len > 0) {
-					if(SHOW_LOGCAT) { Log.i(TAG,"Read  Length : "+len); }
+					if(SHOW_DEBUG) { Log.d(TAG,"Read  Length : "+len); }
 
 					switch(mDisplayType) {
 					case DISP_CHAR :
@@ -390,7 +399,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 	void setSerialDataToTextView(int disp, byte[] rbuf, int len, String sCr, String sLf) {
 		int tmpbuf;
 		for(int i=0;i<len;++i) {
-			if(SHOW_LOGCAT) { Log.i(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
+			if(SHOW_DEBUG) { Log.d(TAG,"Read  Data["+i+"] : "+rbuf[i]); }
 			
 			// "\r":CR(0x0D) "\n":LF(0x0A)
 			if ((mReadLinefeedCode == LINEFEED_CODE_CR) && (rbuf[i] == 0x0D)) {
@@ -504,11 +513,14 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 	}
 	
 	protected void onNewIntent(Intent intent) {
-    	if(!mSerial.isConnected()) {
+		if(SHOW_DEBUG) { Log.d(TAG,"onNewIntent"); }
+		if(!mSerial.isConnected()) {
+			if(SHOW_DEBUG) { Log.d(TAG,"onNewIntent begin"); }
     		mBaudrate = loadDefaultBaudrate();
     		mSerial.begin(mBaudrate);
     	}
 		if(!mRunningMainLoop) {
+			if(SHOW_DEBUG) { Log.d(TAG,"onNewIntent mainloop"); }
 			mainloop();
 		}
 	};
@@ -524,23 +536,29 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         public void onReceive(Context context, Intent intent) {
     		String action = intent.getAction();
     		if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+    			if(SHOW_DEBUG) { Log.d(TAG,"Device attached"); }
             	if(!mSerial.isConnected()) {
+        			if(SHOW_DEBUG) { Log.d(TAG,"Device attached begin"); }
             		mBaudrate = loadDefaultBaudrate();
             		mSerial.begin(mBaudrate);
                 	loadDefaultSettingValues();
                 	mTvSerial.setTextSize(mTextFontSize);
             	}
 				if(!mRunningMainLoop) {
+        			if(SHOW_DEBUG) { Log.d(TAG,"Device attached mainloop"); }
 					mainloop();
 				}
     		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+    			if(SHOW_DEBUG) { Log.d(TAG,"Device detached"); }
     			mStop = true;
     			detachedUi();
     			mSerial.usbDetached(intent);
     			mSerial.end();
     		} else if (ACTION_USB_PERMISSION.equals(action)) {
+    			if(SHOW_DEBUG) { Log.d(TAG,"Request permission"); }
                 synchronized (this) {
                 	if(!mSerial.isConnected()) {
+            			if(SHOW_DEBUG) { Log.d(TAG,"Request permission begin"); }
                 		mBaudrate = loadDefaultBaudrate();
                 		mSerial.begin(mBaudrate);
                     	loadDefaultSettingValues();
@@ -548,6 +566,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 	}
                 }
 				if(!mRunningMainLoop) {
+        			if(SHOW_DEBUG) { Log.d(TAG,"Request permission mainloop"); }
 					mainloop();
 				}
             }

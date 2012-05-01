@@ -1,0 +1,27 @@
+.DS_Store
+*.zip
+*.tar.gz
+*.exe
+*.bz2
+.hg/
+
+# backup
+*~
+*.bak
+
+# java
+*.class
+*.jar
+
+# android
+*.dex
+*.ap_
+R.java
+*.cache
+
+# c/c++
+a.out
+*.o
+*.a
+*.d
+
