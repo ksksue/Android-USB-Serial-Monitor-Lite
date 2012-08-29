@@ -13,10 +13,10 @@
 
         <EditText
             android:id="@+id/etWrite"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:singleLine="true" >
+            android:singleLine="true" android:inputType="text">
 
             <requestFocus />
         </EditText>
@@ -36,7 +36,7 @@
         <LinearLayout
             android:id="@+id/LinearLayout"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
             
             <TextView

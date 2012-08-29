@@ -21,5 +21,5 @@
 	<usb-device vendor-id="1027" product-id="24593" /> <!-- FT4232HL -->
 	<usb-device vendor-id="1027" product-id="24597" /> <!-- FT230X -->
 	<usb-device vendor-id="1412" product-id="45088" /> <!-- REX-USB60F -->
-	<usb-device class="2" /> <!-- CDC -->
+<!--  	<usb-device class="2" /> --> <!-- CDC -->
 </resources>
