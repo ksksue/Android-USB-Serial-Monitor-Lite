@@ -14,7 +14,7 @@ About me
 ---
 ![twitter](http://d.hatena.ne.jp/images/icon-twitter.png "twitter") [@ksksue](http://twitter.com/#!/ksksue "twitter @ksksue")  
 ![icon1](http://a1.twimg.com/profile_images/549237316/twt_bigger.jpg "icon")  
-Web page : Geekle Board - [http://d.hatena.ne.jp/ksksue/](http://d.hatena.ne.jp/ksksue/ "Geekle Board")  
+Web page : Geekle Board - [http://ksksue.com/wiki/](http://ksksue.com/wiki/ "Geekle Board")  
 
 License
 ----------
