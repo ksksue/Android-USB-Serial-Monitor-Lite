@@ -1,3 +1,12 @@
+/*
+ * Android USB Serial Monitor Lite
+ * 
+ * Copyright (C) 2012 Keisuke SUZUKI
+ * Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * thanks to Arun
+ */
 package jp.ksksue.app.terminal;
 
 import jp.ksksue.driver.serial.FTDriver;
@@ -37,7 +46,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     private static final int MENU_ID_CLEARTEXT = 1;
     private static final int MENU_ID_SENDTOEMAIL = 2;
     private static final int MENU_ID_OPENDEVICE = 3;
-    //Add by Arun for close device functionality
     private static final int MENU_ID_CLOSEDEVICE = 4;
   
     private static final int REQUEST_PREFERENCE = 0;
@@ -226,7 +234,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting");
         menu.add(Menu.NONE, MENU_ID_CLEARTEXT, Menu.NONE, "Clear Text");
         menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Email to");
-        //Added Arun for close device fucntion
         menu.add(Menu.NONE, MENU_ID_CLOSEDEVICE, Menu.NONE, "Close Device");
         if(mSerial!=null) {
             if(mSerial.isConnected()) {
@@ -254,7 +261,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
             case MENU_ID_SENDTOEMAIL:
                 sendTextToEmail();
                 return true;
-            //Added By Arun for close device fucntion
             case MENU_ID_CLOSEDEVICE:
                 closeUsbSerial();
                 return true;
@@ -588,14 +594,10 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 
     }
 
-    //Added by Arun close usb device 
     private void closeUsbSerial() {
-        IntentFilter filter = new IntentFilter();
-        registerReceiver(mUsbReceiver,filter);
-    	mSerial.end();    
-    	mStop = true;
-    	unregisterReceiver(mUsbReceiver);
-    	Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show();             
+        detachedUi();
+        mStop = true;
+        mSerial.end();
     }
 
     protected void onNewIntent(Intent intent) {
