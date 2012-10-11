@@ -28,7 +28,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnKeyListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -384,7 +383,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     private Runnable mLoop = new Runnable() {
         @Override
         public void run() {
-            int i;
             int len;
             byte[] rbuf = new byte[4096];
 
@@ -416,7 +414,6 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 mHandler.post(new Runnable() {
                     public void run() {
                         if (mTvSerial.length() > TEXT_MAX_SIZE) {
-                            int clearLength = mTvSerial.length() - TEXT_MAX_SIZE;
                             StringBuilder sb = new StringBuilder();
                             sb.append(mTvSerial.getText());
                             sb.delete(0, TEXT_MAX_SIZE / 2);

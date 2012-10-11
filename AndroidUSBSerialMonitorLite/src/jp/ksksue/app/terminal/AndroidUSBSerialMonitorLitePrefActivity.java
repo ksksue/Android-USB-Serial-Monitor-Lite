@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
