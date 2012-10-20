@@ -9,7 +9,6 @@
  */
 package jp.ksksue.app.terminal;
 
-import jp.ksksue.driver.serial.FTDriver;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -17,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,36 +28,42 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnKeyListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import jp.ksksue.driver.serial.FTDriver;
+
 public class AndroidUSBSerialMonitorLite extends Activity {
     // debug settings
-    private static final boolean SHOW_DEBUG = false;
+    private static final boolean SHOW_DEBUG                 = false;
     private static final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
 
     // occurs USB packet loss if TEXT_MAX_SIZE is over 6000
     private static final int TEXT_MAX_SIZE = 8192;
-    private static final int MENU_ID_SETTING = 0;
-    private static final int MENU_ID_CLEARTEXT = 1;
-    private static final int MENU_ID_SENDTOEMAIL = 2;
-    private static final int MENU_ID_OPENDEVICE = 3;
-    private static final int MENU_ID_CLOSEDEVICE = 4;
-  
-    private static final int REQUEST_PREFERENCE = 0;
 
+    private static final int MENU_ID_SETTING        = 0;
+    private static final int MENU_ID_CLEARTEXT      = 1;
+    private static final int MENU_ID_SENDTOEMAIL    = 2;
+    private static final int MENU_ID_OPENDEVICE     = 3;
+    private static final int MENU_ID_CLOSEDEVICE    = 4;
+    private static final int MENU_ID_WORDLIST       = 5;
+  
+    private static final int REQUEST_PREFERENCE         = 0;
+    private static final int REQUEST_WORD_LIST_ACTIVITY = 1;
+    
     // Defines of Display Settings
-    private static final int DISP_CHAR = 0;
-    private static final int DISP_DEC = 1;
-    private static final int DISP_HEX = 2;
+    private static final int DISP_CHAR  = 0;
+    private static final int DISP_DEC   = 1;
+    private static final int DISP_HEX   = 2;
 
     // Linefeed Code Settings
-    private static final int LINEFEED_CODE_CR = 0;
+    private static final int LINEFEED_CODE_CR   = 0;
     private static final int LINEFEED_CODE_CRLF = 1;
-    private static final int LINEFEED_CODE_LF = 2;
+    private static final int LINEFEED_CODE_LF   = 2;
 
     // Load Bundle Key (for view switching)
     private static final String BUNDLEKEY_LOADTEXTVIEW = "bundlekey.LoadTextView";
@@ -76,17 +82,19 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     private Button btWrite;
     private EditText etWrite;
 
-    private int mTextFontSize = 12;
-    private int mDisplayType = DISP_CHAR;
-    private int mReadLinefeedCode = LINEFEED_CODE_LF;
-    private int mWriteLinefeedCode = LINEFEED_CODE_LF;
-    private int mBaudrate = FTDriver.BAUD9600;
-    private int mDataBits = FTDriver.FTDI_SET_DATA_BITS_8;
-    private int mParity = FTDriver.FTDI_SET_DATA_PARITY_NONE;
-    private int mStopBits = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
-    private int mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
-    private int mBreak = FTDriver.FTDI_SET_NOBREAK;
-    private String mEmailAddress = "@gmail.com";
+    // Default settings
+    private int mTextFontSize       = 12;
+    private Typeface mTextTypeface  = Typeface.MONOSPACE;
+    private int mDisplayType        = DISP_CHAR;
+    private int mReadLinefeedCode   = LINEFEED_CODE_LF;
+    private int mWriteLinefeedCode  = LINEFEED_CODE_LF;
+    private int mBaudrate           = FTDriver.BAUD9600;
+    private int mDataBits           = FTDriver.FTDI_SET_DATA_BITS_8;
+    private int mParity             = FTDriver.FTDI_SET_DATA_PARITY_NONE;
+    private int mStopBits           = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
+    private int mFlowControl        = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+    private int mBreak              = FTDriver.FTDI_SET_NOBREAK;
+    private String mEmailAddress    = "@gmail.com";
 
     private boolean mRunningMainLoop = false;
 
@@ -101,9 +109,9 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-//        if(!getWindow().hasFeature(Window.FEATURE_ACTION_BAR)) {
-//            requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        }
+        if(!getWindow().hasFeature(Window.FEATURE_ACTION_BAR)) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
         
         setContentView(R.layout.main);
 
@@ -113,7 +121,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         btWrite.setEnabled(false);
         etWrite = (EditText) findViewById(R.id.etWrite);
         etWrite.setEnabled(false);
-        // etWrite.setHint("CR : \\r, LF : \\n");
+        etWrite.setHint("CR : \\r, LF : \\n");
 
         if (SHOW_DEBUG) {
             Log.d(TAG, "New FTDriver");
@@ -224,22 +232,30 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         return str;
     }
 
+    public void setWriteTextString(String str)
+    {
+        etWrite.setText(str);
+    }
+    
     // ---------------------------------------------------------------------------------------
     // Menu Button
     // ---------------------------------------------------------------------------------------
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, MENU_ID_OPENDEVICE, Menu.NONE, "Open Device");
-        menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting");
+        menu.add(Menu.NONE, MENU_ID_WORDLIST, Menu.NONE, "Word List ...");
+        menu.add(Menu.NONE, MENU_ID_SETTING, Menu.NONE, "Setting ...");
         menu.add(Menu.NONE, MENU_ID_CLEARTEXT, Menu.NONE, "Clear Text");
-        menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Email to");
+        menu.add(Menu.NONE, MENU_ID_SENDTOEMAIL, Menu.NONE, "Email to ...");
         menu.add(Menu.NONE, MENU_ID_CLOSEDEVICE, Menu.NONE, "Close Device");
-        if(mSerial!=null) {
+/*        if(mSerial!=null) {
             if(mSerial.isConnected()) {
                 menu.getItem(MENU_ID_OPENDEVICE).setEnabled(false);
+            } else {
+                menu.getItem(MENU_ID_CLOSEDEVICE).setEnabled(false);
             }
         }
-        return super.onCreateOptionsMenu(menu);
+*/        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -247,6 +263,10 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         switch (item.getItemId()) {
             case MENU_ID_OPENDEVICE:
                 openUsbSerial();
+                return true;
+            case MENU_ID_WORDLIST:
+                Intent intent = new Intent(this, WordListActivity.class);
+                startActivityForResult(intent, REQUEST_WORD_LIST_ACTIVITY);
                 return true;
             case MENU_ID_SETTING:
                 startActivityForResult(new Intent().setClassName(this.getPackageName(),
@@ -271,7 +291,18 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_PREFERENCE) {
+        if (requestCode == REQUEST_WORD_LIST_ACTIVITY) {
+            if(resultCode == RESULT_OK) {
+                try {
+                    String strWord = data.getStringExtra("word");
+                    etWrite.setText(strWord);
+                    // Set a cursor position last
+                    etWrite.setSelection(etWrite.getText().length());
+                } catch(Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        } else if (requestCode == REQUEST_PREFERENCE) {
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -281,6 +312,24 @@ public class AndroidUSBSerialMonitorLite extends Activity {
             res = pref.getString("fontsize_list", Integer.toString(12));
             mTextFontSize = Integer.valueOf(res);
             mTvSerial.setTextSize(mTextFontSize);
+
+            res = pref.getString("typeface_list", Integer.toString(3));
+            switch(Integer.valueOf(res)){
+                case 0:
+                    mTextTypeface = Typeface.DEFAULT;
+                    break;
+                case 1:
+                    mTextTypeface = Typeface.SANS_SERIF;
+                    break;
+                case 2:
+                    mTextTypeface = Typeface.SERIF;
+                    break;
+                case 3:
+                    mTextTypeface = Typeface.MONOSPACE;
+                    break;
+            }
+            mTvSerial.setTypeface(mTextTypeface);
+            etWrite.setTypeface(mTextTypeface);
 
             res = pref.getString("readlinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
             mReadLinefeedCode = Integer.valueOf(res);
@@ -520,6 +569,24 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 
         res = pref.getString("fontsize_list", Integer.toString(12));
         mTextFontSize = Integer.valueOf(res);
+
+        res = pref.getString("typeface_list", Integer.toString(3));
+        switch(Integer.valueOf(res)){
+            case 0:
+                mTextTypeface = Typeface.DEFAULT;
+                break;
+            case 1:
+                mTextTypeface = Typeface.SANS_SERIF;
+                break;
+            case 2:
+                mTextTypeface = Typeface.SERIF;
+                break;
+            case 3:
+                mTextTypeface = Typeface.MONOSPACE;
+                break;
+        }
+        mTvSerial.setTypeface(mTextTypeface);
+        etWrite.setTypeface(mTextTypeface);
 
         res = pref.getString("readlinefeedcode_list", Integer.toString(LINEFEED_CODE_CRLF));
         mReadLinefeedCode = Integer.valueOf(res);

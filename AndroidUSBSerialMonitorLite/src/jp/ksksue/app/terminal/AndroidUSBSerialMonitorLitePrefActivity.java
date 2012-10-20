@@ -134,6 +134,40 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
             }
             lp.setSummary(summary);
 
+            lp = (ListPreference) getPreferenceScreen().findPreference("readlinefeedcode_list");
+            switch (Integer.valueOf(lp.getValue())) {
+                case 0:
+                    summary = "CR";
+                    break;
+                case 1:
+                    summary = "CR+LF";
+                    break;
+                case 2:
+                    summary = "LF";
+                    break;
+                default:
+                    summary = "None";
+                    break;
+            }
+            lp.setSummary(summary);
+
+            lp = (ListPreference) getPreferenceScreen().findPreference("writelinefeedcode_list");
+            switch (Integer.valueOf(lp.getValue())) {
+                case 0:
+                    summary = "CR";
+                    break;
+                case 1:
+                    summary = "CR+LF";
+                    break;
+                case 2:
+                    summary = "LF";
+                    break;
+                default:
+                    summary = "None";
+                    break;
+            }
+            lp.setSummary(summary);
+
         }
 
         @Override
@@ -178,6 +212,26 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
                     "fontsize_list");
             lp.setSummary(lp.getValue());
 
+            lp = (ListPreference) getPreferenceScreen().findPreference("typeface_list");
+            switch(Integer.valueOf(lp.getValue())) {
+                case 0:
+                    summary = "normal";
+                    break;
+                case 1:
+                    summary = "sans";
+                    break;
+                case 2:
+                    summary = "serif";
+                    break;
+                case 3:
+                    summary = "monospace";
+                    break;
+                default:
+                    summary = "normal";
+                    break;
+            }
+            lp.setSummary(summary);
+
             lp = (ListPreference) getPreferenceScreen().findPreference("display_list");
             switch (Integer.valueOf(lp.getValue())) {
                 case 0:
@@ -188,40 +242,6 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
                     break;
                 case 2:
                     summary = "Hex";
-                    break;
-                default:
-                    summary = "None";
-                    break;
-            }
-            lp.setSummary(summary);
-
-            lp = (ListPreference) getPreferenceScreen().findPreference("readlinefeedcode_list");
-            switch (Integer.valueOf(lp.getValue())) {
-                case 0:
-                    summary = "CR";
-                    break;
-                case 1:
-                    summary = "CR+LF";
-                    break;
-                case 2:
-                    summary = "LF";
-                    break;
-                default:
-                    summary = "None";
-                    break;
-            }
-            lp.setSummary(summary);
-
-            lp = (ListPreference) getPreferenceScreen().findPreference("writelinefeedcode_list");
-            switch (Integer.valueOf(lp.getValue())) {
-                case 0:
-                    summary = "CR";
-                    break;
-                case 1:
-                    summary = "CR+LF";
-                    break;
-                case 2:
-                    summary = "LF";
                     break;
                 default:
                     summary = "None";

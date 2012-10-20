@@ -10,6 +10,12 @@
         <item>14</item>
         <item>16</item>
         <item>20</item>
+        <item>32</item>
+        <item>48</item>
+        <item>64</item>
+        <item>72</item>
+        <item>100</item>
+        <item>128</item>
     </string-array>
     <string-array name="fontsize_entryvalues">
         <item>8</item>
@@ -19,6 +25,25 @@
         <item>14</item>
         <item>16</item>
         <item>20</item>
+        <item>32</item>
+        <item>48</item>
+        <item>64</item>
+        <item>72</item>
+        <item>100</item>
+        <item>128</item>
+    </string-array>
+    
+    <string-array name="typeface_entries">
+        <item>monospace</item>
+        <item>normal</item>
+        <item>sans</item>
+        <item>serif</item>
+    </string-array>
+    <string-array name="typeface_entryvalues">
+        <item>3</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
     
     

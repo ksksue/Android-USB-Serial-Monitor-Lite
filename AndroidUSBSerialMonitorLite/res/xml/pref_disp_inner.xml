@@ -9,7 +9,16 @@
 		    android:entryValues="@array/fontsize_entryvalues"
 		    android:defaultValue="12"
 		/>
-	
+	    
+	    <ListPreference
+		    android:key="typeface_list"
+		    android:title="@string/typeface_title"
+		    android:summary="@string/typeface_summary"
+		    android:entries="@array/typeface_entries"
+		    android:entryValues="@array/typeface_entryvalues"
+		    android:defaultValue="3"
+		/>
+	    	
 		<ListPreference
 		    android:key="display_list"
 		    android:title="@string/display_title"
@@ -17,25 +26,6 @@
 		    android:entries="@array/display_entries"
 		    android:entryValues="@array/display_entryvalues"
 		    android:defaultValue="0"
-		/>
-	</PreferenceCategory>
-	
-	<PreferenceCategory android:title="@string/linefeedcode_setting_title">
-		<ListPreference
-		    android:key="readlinefeedcode_list"
-		    android:title="@string/readlinefeedcode_title"
-		    android:summary="@string/readlinefeedcode_summary"
-		    android:entries="@array/readlinefeedcode_entries"
-		    android:entryValues="@array/readlinefeedcode_entryvalues"
-		    android:defaultValue="2"
-		/>
-		<ListPreference
-		    android:key="writelinefeedcode_list"
-		    android:title="@string/writelinefeedcode_title"
-		    android:summary="@string/writelinefeedcode_summary"
-		    android:entries="@array/writelinefeedcode_entries"
-		    android:entryValues="@array/writelinefeedcode_entryvalues"
-		    android:defaultValue="2"
 		/>
 	</PreferenceCategory>
 	
