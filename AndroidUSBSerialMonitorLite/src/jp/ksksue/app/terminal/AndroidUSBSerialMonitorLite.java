@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -41,6 +42,8 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     // debug settings
     private static final boolean SHOW_DEBUG                 = false;
     private static final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
+
+    public static final boolean isICSorHigher = ( Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2 );
 
     // occurs USB packet loss if TEXT_MAX_SIZE is over 6000
     private static final int TEXT_MAX_SIZE = 8192;
@@ -108,11 +111,15 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        if(!getWindow().hasFeature(Window.FEATURE_ACTION_BAR)) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+/* FIXME : How to check that there is a title bar menu or not.
+        // Should not set a Window.FEATURE_NO_TITLE on Honeycomb because a user cannot see menu button.
+        if(isICSorHigher) {
+            if(!getWindow().hasFeature(Window.FEATURE_ACTION_BAR)) {
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+            }
         }
-        
+*/
         setContentView(R.layout.main);
 
         mSvText = (ScrollView) findViewById(R.id.svText);
@@ -347,32 +354,37 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 mSerial.setSerialPropertyToChip(FTDriver.CH_A);
             }
 
+            int intRes;
             res = pref.getString("parity_list",
                     Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
-            if (mParity != Integer.valueOf(res)) {
-                mParity = Integer.valueOf(res);
+            intRes = Integer.valueOf(res) << 8;
+            if (mParity != intRes) {
+                mParity = intRes;
                 mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
                 mSerial.setSerialPropertyToChip(FTDriver.CH_A);
             }
 
             res = pref.getString("stopbits_list",
                     Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
-            if (mStopBits != Integer.valueOf(res)) {
-                mStopBits = Integer.valueOf(res);
+            intRes = Integer.valueOf(res) << 11;
+            if (mStopBits != intRes) {
+                mStopBits = intRes;
                 mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
                 mSerial.setSerialPropertyToChip(FTDriver.CH_A);
             }
 
             res = pref.getString("flowcontrol_list",
                     Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
-            if (mFlowControl != Integer.valueOf(res)) {
-                mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+            intRes = Integer.valueOf(res) << 8;
+            if (mFlowControl != intRes) {
+                mFlowControl = intRes;
                 mSerial.setFlowControl(FTDriver.CH_A, mFlowControl);
             }
 
             res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
-            if (mBreak != Integer.valueOf(res)) {
-                mBreak = FTDriver.FTDI_SET_NOBREAK;
+            intRes = Integer.valueOf(res) << 14;
+            if (mBreak != intRes) {
+                mBreak = intRes;
                 mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
                 mSerial.setSerialPropertyToChip(FTDriver.CH_A);
             }
@@ -602,20 +614,20 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         mSerial.setSerialPropertyDataBit(mDataBits, FTDriver.CH_A);
 
         res = pref.getString("parity_list", Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
-        mParity = Integer.valueOf(res);
+        mParity = Integer.valueOf(res) << 8; // parity_list's number is 0 to 4
         mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
 
         res = pref.getString("stopbits_list", Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
-        mStopBits = Integer.valueOf(res);
+        mStopBits = Integer.valueOf(res) << 11; // stopbits_list's number is 0 to 2
         mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
 
         res = pref
                 .getString("flowcontrol_list", Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
-        mFlowControl = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
+        mFlowControl = Integer.valueOf(res) << 8;
         mSerial.setFlowControl(FTDriver.CH_A, mFlowControl);
 
         res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
-        mBreak = FTDriver.FTDI_SET_NOBREAK;
+        mBreak = Integer.valueOf(res) << 14;
         mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
 
         mSerial.setSerialPropertyToChip(FTDriver.CH_A);

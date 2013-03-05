@@ -33,6 +33,7 @@ public class WordListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if(!getWindow().hasFeature(Window.FEATURE_ACTION_BAR)) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }

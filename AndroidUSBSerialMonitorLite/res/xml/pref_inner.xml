@@ -36,15 +36,17 @@
             android:entryValues="@array/flowcontrol_entryvalues"
             android:key="flowcontrol_list"
             android:summary="@string/flowcontrol_summary"
-            android:title="@string/flowcontrol_title" />
+            android:title="@string/flowcontrol_title" 
+            android:enabled="false"/>
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/break_entries"
             android:entryValues="@array/break_entryvalues"
             android:key="break_list"
             android:summary="@string/break_summary"
-            android:title="@string/break_title" />
-    </PreferenceCategory>
+            android:title="@string/break_title"
+            android:enabled="false" />
+        </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/linefeedcode_setting_title" >
         <ListPreference
