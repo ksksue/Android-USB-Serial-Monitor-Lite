@@ -8,7 +8,13 @@ USB Serial Terminal for Android
 - linefeed code setting
 - email result to your address
 
-require the FTDriver library project
+require **Physicaloid Library** project
+
+Physicaloid Library [https://github.com/ksksue/PhysicaloidLibrary](https://github.com/ksksue/PhysicaloidLibrary "Physicaloid Library")
+- support CDC-ACM
+- support FTDI
+- support Silicon Labs CP210x
+
 
 About me
 ---
