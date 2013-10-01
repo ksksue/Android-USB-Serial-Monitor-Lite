@@ -9,8 +9,8 @@
  */
 package jp.ksksue.app.terminal;
 
+import java.io.IOException;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -129,7 +129,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         btWrite.setEnabled(false);
         etWrite = (EditText) findViewById(R.id.etWrite);
         etWrite.setEnabled(false);
-        etWrite.setHint("CR : \\r, LF : \\n");
+        etWrite.setHint("CR : \\r, LF : \\n, bin : \\u0000");
 
         if (SHOW_DEBUG) {
             Log.d(TAG, "New FTDriver");
@@ -194,29 +194,33 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 
     private void writeDataToSerial() {
         String strWrite = etWrite.getText().toString();
-        strWrite = changeLinefeedcode(strWrite);
+        strWrite = changeEscapeSequence(strWrite);
         if (SHOW_DEBUG) {
             Log.d(TAG, "FTDriver Write(" + strWrite.length() + ") : " + strWrite);
         }
         mSerial.write(strWrite.getBytes(), strWrite.length());
     }
 
-    private String changeLinefeedcode(String str) {
-        str = str.replace("\\r", "\r");
-        str = str.replace("\\n", "\n");
+    private String changeEscapeSequence(String in) {
+        String out = new String();
+        try {
+            out = unescapeJava(in);
+        } catch (IOException e) {
+            return "";
+        }
         switch (mWriteLinefeedCode) {
             case LINEFEED_CODE_CR:
-                str = str + "\r";
+                out = out + "\r";
                 break;
             case LINEFEED_CODE_CRLF:
-                str = str + "\r\n";
+                out = out + "\r\n";
                 break;
             case LINEFEED_CODE_LF:
-                str = str + "\n";
+                out = out + "\n";
                 break;
             default:
         }
-        return str;
+        return out;
     }
 
     public void setWriteTextString(String str)
@@ -738,4 +742,106 @@ public class AndroidUSBSerialMonitorLite extends Activity {
             }
         }
     };
+
+
+    /**
+     * <p>Unescapes any Java literals found in the <code>String</code> to a
+     * <code>Writer</code>.</p>
+     *
+     * <p>For example, it will turn a sequence of <code>'\'</code> and
+     * <code>'n'</code> into a newline character, unless the <code>'\'</code>
+     * is preceded by another <code>'\'</code>.</p>
+     * 
+     * <p>A <code>null</code> string input has no effect.</p>
+     * 
+     * @param out  the <code>String</code> used to output unescaped characters
+     * @param str  the <code>String</code> to unescape, may be null
+     * @throws IllegalArgumentException if the Writer is <code>null</code>
+     * @throws IOException if error occurs on underlying Writer
+     */
+    private String unescapeJava(String str) throws IOException {
+        if (str == null) {
+            return "";
+        }
+        int sz = str.length();
+        StringBuffer unicode = new StringBuffer(4);
+
+        StringBuilder strout = new StringBuilder();
+        boolean hadSlash = false;
+        boolean inUnicode = false;
+        for (int i = 0; i < sz; i++) {
+            char ch = str.charAt(i);
+            if (inUnicode) {
+                // if in unicode, then we're reading unicode
+                // values in somehow
+                unicode.append(ch);
+                if (unicode.length() == 4) {
+                    // unicode now contains the four hex digits
+                    // which represents our unicode character
+                    try {
+                        int value = Integer.parseInt(unicode.toString(), 16);
+                        strout.append((char) value);
+                        unicode.setLength(0);
+                        inUnicode = false;
+                        hadSlash = false;
+                    } catch (NumberFormatException nfe) {
+                        // throw new NestableRuntimeException("Unable to parse unicode value: " + unicode, nfe);
+                        throw new IOException("Unable to parse unicode value: " + unicode, nfe);
+                    }
+                }
+                continue;
+            }
+            if (hadSlash) {
+                // handle an escaped value
+                hadSlash = false;
+                switch (ch) {
+                    case '\\':
+                        strout.append('\\');
+                        break;
+                    case '\'':
+                        strout.append('\'');
+                        break;
+                    case '\"':
+                        strout.append('"');
+                        break;
+                    case 'r':
+                        strout.append('\r');
+                        break;
+                    case 'f':
+                        strout.append('\f');
+                        break;
+                    case 't':
+                        strout.append('\t');
+                        break;
+                    case 'n':
+                        strout.append('\n');
+                        break;
+                    case 'b':
+                        strout.append('\b');
+                        break;
+                    case 'u':
+                        {
+                            // uh-oh, we're in unicode country....
+                            inUnicode = true;
+                            break;
+                        }
+                    default :
+                        strout.append(ch);
+                        break;
+                }
+                continue;
+            } else if (ch == '\\') {
+                hadSlash = true;
+                continue;
+            }
+            strout.append(ch);
+        }
+        if (hadSlash) {
+            // then we're in the weird case of a \ at the end of the
+            // string, let's output it anyway.
+            strout.append('\\');
+        }
+        return new String(strout.toString());
+    }
+
 }
