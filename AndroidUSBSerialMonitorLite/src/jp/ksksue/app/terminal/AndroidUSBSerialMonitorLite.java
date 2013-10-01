@@ -29,16 +29,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnKeyListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import jp.ksksue.driver.serial.FTDriver;
+import com.physicaloid.lib.Physicaloid;
+import com.physicaloid.lib.usb.driver.uart.UartConfig;
 
 public class AndroidUSBSerialMonitorLite extends Activity {
+    static final int PREFERENCE_REV_NUM = 1;
+
     // debug settings
     private static final boolean SHOW_DEBUG                 = false;
     private static final boolean USE_WRITE_BUTTON_FOR_DEBUG = false;
@@ -71,7 +73,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     // Load Bundle Key (for view switching)
     private static final String BUNDLEKEY_LOADTEXTVIEW = "bundlekey.LoadTextView";
 
-    FTDriver mSerial;
+    Physicaloid mSerial;
 
     private ScrollView mSvText;
     private TextView mTvSerial;
@@ -91,12 +93,11 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     private int mDisplayType        = DISP_CHAR;
     private int mReadLinefeedCode   = LINEFEED_CODE_LF;
     private int mWriteLinefeedCode  = LINEFEED_CODE_LF;
-    private int mBaudrate           = FTDriver.BAUD9600;
-    private int mDataBits           = FTDriver.FTDI_SET_DATA_BITS_8;
-    private int mParity             = FTDriver.FTDI_SET_DATA_PARITY_NONE;
-    private int mStopBits           = FTDriver.FTDI_SET_DATA_STOP_BITS_1;
-    private int mFlowControl        = FTDriver.FTDI_SET_FLOW_CTRL_NONE;
-    private int mBreak              = FTDriver.FTDI_SET_NOBREAK;
+    private int mBaudrate           = 9600;
+    private int mDataBits           = UartConfig.DATA_BITS8;
+    private int mParity             = UartConfig.PARITY_NONE;
+    private int mStopBits           = UartConfig.STOP_BITS1;
+    private int mFlowControl        = UartConfig.FLOW_CONTROL_OFF;
     private String mEmailAddress    = "@gmail.com";
 
     private boolean mRunningMainLoop = false;
@@ -135,7 +136,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         }
 
         // get service
-        mSerial = new FTDriver((UsbManager) getSystemService(Context.USB_SERVICE));
+        mSerial = new Physicaloid(this);
 
         if (SHOW_DEBUG) {
             Log.d(TAG, "New instance : " + mSerial);
@@ -146,32 +147,11 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(mUsbReceiver, filter);
 
-        // load default baud rate
-        mBaudrate = loadDefaultBaudrate();
-
-        // for requesting permission
-        // setPermissionIntent() before begin()
-        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
-                ACTION_USB_PERMISSION), 0);
-        mSerial.setPermissionIntent(permissionIntent);
-
         if (SHOW_DEBUG) {
             Log.d(TAG, "FTDriver beginning");
         }
 
-        if (mSerial.begin(mBaudrate)) {
-            if (SHOW_DEBUG) {
-                Log.d(TAG, "FTDriver began");
-            }
-            loadDefaultSettingValues();
-            mTvSerial.setTextSize(mTextFontSize);
-            mainloop();
-        } else {
-            if (SHOW_DEBUG) {
-                Log.d(TAG, "FTDriver no connection");
-            }
-            Toast.makeText(this, "no connection", Toast.LENGTH_SHORT).show();
-        }
+        openUsbSerial();
 
         etWrite.setOnKeyListener(new OnKeyListener() {
             @Override
@@ -347,40 +327,51 @@ public class AndroidUSBSerialMonitorLite extends Activity {
             res = pref.getString("email_edittext", "@gmail.com");
             mEmailAddress = res;
 
-            res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
-            if (mDataBits != Integer.valueOf(res)) {
-                mDataBits = Integer.valueOf(res);
-                mSerial.setSerialPropertyDataBit(mDataBits, FTDriver.CH_A);
-                mSerial.setSerialPropertyToChip(FTDriver.CH_A);
+            int intRes;
+
+            res = pref.getString("baudrate_list", Integer.toString(9600));
+            intRes = Integer.valueOf(res);
+            if (mBaudrate != intRes) {
+                mBaudrate = intRes;
+                mSerial.setBaudrate(mBaudrate);
             }
 
-            int intRes;
+            res = pref.getString("databits_list", Integer.toString(UartConfig.DATA_BITS8));
+            intRes = Integer.valueOf(res);
+            if (mDataBits != intRes) {
+                mDataBits = Integer.valueOf(res);
+                mSerial.setDataBits(mDataBits);
+            }
+
             res = pref.getString("parity_list",
-                    Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
-            intRes = Integer.valueOf(res) << 8;
+                    Integer.toString(UartConfig.PARITY_NONE));
+            intRes = Integer.valueOf(res);
             if (mParity != intRes) {
                 mParity = intRes;
-                mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
-                mSerial.setSerialPropertyToChip(FTDriver.CH_A);
+                mSerial.setParity(mParity);
             }
 
             res = pref.getString("stopbits_list",
-                    Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
-            intRes = Integer.valueOf(res) << 11;
+                    Integer.toString(UartConfig.STOP_BITS1));
+            intRes = Integer.valueOf(res);
             if (mStopBits != intRes) {
                 mStopBits = intRes;
-                mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
-                mSerial.setSerialPropertyToChip(FTDriver.CH_A);
+                mSerial.setStopBits(mStopBits);
             }
 
             res = pref.getString("flowcontrol_list",
-                    Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
-            intRes = Integer.valueOf(res) << 8;
+                    Integer.toString(UartConfig.FLOW_CONTROL_OFF));
+            intRes = Integer.valueOf(res);
             if (mFlowControl != intRes) {
                 mFlowControl = intRes;
-                mSerial.setFlowControl(FTDriver.CH_A, mFlowControl);
+                if(mFlowControl == UartConfig.FLOW_CONTROL_ON) {
+                    mSerial.setDtrRts(true, true);
+                } else {
+                    mSerial.setDtrRts(false, false);
+                }
             }
 
+            /*
             res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
             intRes = Integer.valueOf(res) << 14;
             if (mBreak != intRes) {
@@ -388,13 +379,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
                 mSerial.setSerialPropertyToChip(FTDriver.CH_A);
             }
-
-            // reset baudrate
-            res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
-            if (mBaudrate != Integer.valueOf(res)) {
-                mBaudrate = Integer.valueOf(res);
-                mSerial.setBaudrate(mBaudrate, 0);
-            }
+            */
         }
     }
 
@@ -423,7 +408,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
 
     @Override
     public void onDestroy() {
-        mSerial.end();
+        mSerial.close();
         mStop = true;
         unregisterReceiver(mUsbReceiver);
         super.onDestroy();
@@ -609,28 +594,20 @@ public class AndroidUSBSerialMonitorLite extends Activity {
         res = pref.getString("email_edittext", "@gmail.com");
         mEmailAddress = res;
 
-        res = pref.getString("databits_list", Integer.toString(FTDriver.FTDI_SET_DATA_BITS_8));
+        res = pref.getString("baudrate_list", Integer.toString(9600));
+        mBaudrate = Integer.valueOf(res);
+
+        res = pref.getString("databits_list", Integer.toString(UartConfig.DATA_BITS8));
         mDataBits = Integer.valueOf(res);
-        mSerial.setSerialPropertyDataBit(mDataBits, FTDriver.CH_A);
 
-        res = pref.getString("parity_list", Integer.toString(FTDriver.FTDI_SET_DATA_PARITY_NONE));
-        mParity = Integer.valueOf(res) << 8; // parity_list's number is 0 to 4
-        mSerial.setSerialPropertyParity(mParity, FTDriver.CH_A);
+        res = pref.getString("parity_list", Integer.toString(UartConfig.PARITY_NONE));
+        mParity = Integer.valueOf(res);
 
-        res = pref.getString("stopbits_list", Integer.toString(FTDriver.FTDI_SET_DATA_STOP_BITS_1));
-        mStopBits = Integer.valueOf(res) << 11; // stopbits_list's number is 0 to 2
-        mSerial.setSerialPropertyStopBits(mStopBits, FTDriver.CH_A);
+        res = pref.getString("stopbits_list", Integer.toString(UartConfig.STOP_BITS1));
+        mStopBits = Integer.valueOf(res);
 
-        res = pref
-                .getString("flowcontrol_list", Integer.toString(FTDriver.FTDI_SET_FLOW_CTRL_NONE));
-        mFlowControl = Integer.valueOf(res) << 8;
-        mSerial.setFlowControl(FTDriver.CH_A, mFlowControl);
-
-        res = pref.getString("break_list", Integer.toString(FTDriver.FTDI_SET_NOBREAK));
-        mBreak = Integer.valueOf(res) << 14;
-        mSerial.setSerialPropertyBreak(mBreak, FTDriver.CH_A);
-
-        mSerial.setSerialPropertyToChip(FTDriver.CH_A);
+        res = pref.getString("flowcontrol_list", Integer.toString(UartConfig.FLOW_CONTROL_OFF));
+        mFlowControl = Integer.valueOf(res);
     }
 
     private void sendTextToEmail() {
@@ -646,20 +623,40 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     // Load default baud rate
     int loadDefaultBaudrate() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String res = pref.getString("baudrate_list", Integer.toString(FTDriver.BAUD9600));
+        String res = pref.getString("baudrate_list", Integer.toString(9600));
         return Integer.valueOf(res);
     }
     
     private void openUsbSerial() {
-        if (!mSerial.isConnected()) {
+        if(mSerial == null) {
+            Toast.makeText(this, "cannot open", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!mSerial.isOpened()) {
             if (SHOW_DEBUG) {
                 Log.d(TAG, "onNewIntent begin");
             }
-            mBaudrate = loadDefaultBaudrate();
-            if (!mSerial.begin(mBaudrate)) {
+            if (!mSerial.open()) {
                 Toast.makeText(this, "cannot open", Toast.LENGTH_SHORT).show();
                 return;
             } else {
+                loadDefaultSettingValues();
+
+                boolean dtrOn=false;
+                boolean rtsOn=false;
+                if(mFlowControl == UartConfig.FLOW_CONTROL_ON) {
+                    dtrOn = true;
+                    rtsOn = true;
+                }
+                mSerial.setConfig(new UartConfig(mBaudrate, mDataBits, mStopBits, mParity, dtrOn, rtsOn));
+
+                if(SHOW_DEBUG) {
+                    Log.d(TAG, "setConfig : baud : "+mBaudrate+", DataBits : "+mDataBits+", StopBits : "+mStopBits+", Parity : "+mParity+", dtr : "+dtrOn+", rts : "+rtsOn);
+                }
+
+                mTvSerial.setTextSize(mTextFontSize);
+
                 Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
             }
         }
@@ -673,7 +670,7 @@ public class AndroidUSBSerialMonitorLite extends Activity {
     private void closeUsbSerial() {
         detachedUi();
         mStop = true;
-        mSerial.end();
+        mSerial.close();
     }
 
     protected void onNewIntent(Intent intent) {
@@ -700,14 +697,11 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 if (SHOW_DEBUG) {
                     Log.d(TAG, "Device attached");
                 }
-                if (!mSerial.isConnected()) {
+                if (!mSerial.isOpened()) {
                     if (SHOW_DEBUG) {
                         Log.d(TAG, "Device attached begin");
                     }
-                    mBaudrate = loadDefaultBaudrate();
-                    mSerial.begin(mBaudrate);
-                    loadDefaultSettingValues();
-                    mTvSerial.setTextSize(mTextFontSize);
+                    openUsbSerial();
                 }
                 if (!mRunningMainLoop) {
                     if (SHOW_DEBUG) {
@@ -721,21 +715,18 @@ public class AndroidUSBSerialMonitorLite extends Activity {
                 }
                 mStop = true;
                 detachedUi();
-                mSerial.usbDetached(intent);
-                mSerial.end();
+//                mSerial.usbDetached(intent);
+                mSerial.close();
             } else if (ACTION_USB_PERMISSION.equals(action)) {
                 if (SHOW_DEBUG) {
                     Log.d(TAG, "Request permission");
                 }
                 synchronized (this) {
-                    if (!mSerial.isConnected()) {
+                    if (!mSerial.isOpened()) {
                         if (SHOW_DEBUG) {
                             Log.d(TAG, "Request permission begin");
                         }
-                        mBaudrate = loadDefaultBaudrate();
-                        mSerial.begin(mBaudrate);
-                        loadDefaultSettingValues();
-                        mTvSerial.setTextSize(mTextFontSize);
+                        openUsbSerial();
                     }
                 }
                 if (!mRunningMainLoop) {

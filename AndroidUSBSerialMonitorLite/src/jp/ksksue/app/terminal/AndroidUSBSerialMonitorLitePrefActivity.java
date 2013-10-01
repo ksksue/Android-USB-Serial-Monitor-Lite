@@ -78,7 +78,8 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
                     summary = "Space";
                     break;
                 default:
-                    summary = "none";
+                    summary = "None";
+                    lp.setValue("0");
                     break;
             }
             lp.setSummary(summary);
@@ -96,6 +97,7 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
                     break;
                 default:
                     summary = "1";
+                    lp.setValue("0");
                     break;
             }
             lp.setSummary(summary);
@@ -103,23 +105,19 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
             lp = (ListPreference) getPreferenceScreen().findPreference("flowcontrol_list");
             switch (Integer.valueOf(lp.getValue())) {
                 case 0:
-                    summary = "None";
+                    summary = "Off";
                     break;
                 case 1:
-                    summary = "Rts/Cts";
-                    break;
-                case 2:
-                    summary = "Dtr/Dsr";
-                    break;
-                case 3:
-                    summary = "Xon";
+                    summary = "On";
                     break;
                 default:
-                    summary = "none";
+                    summary = "Off";
+                    lp.setValue("0");
                     break;
             }
             lp.setSummary(summary);
 
+            /*
             lp = (ListPreference) getPreferenceScreen().findPreference("break_list");
             switch (Integer.valueOf(lp.getValue())) {
                 case 0:
@@ -133,6 +131,7 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
                     break;
             }
             lp.setSummary(summary);
+             */
 
             lp = (ListPreference) getPreferenceScreen().findPreference("readlinefeedcode_list");
             switch (Integer.valueOf(lp.getValue())) {
@@ -168,6 +167,7 @@ public class AndroidUSBSerialMonitorLitePrefActivity extends PreferenceActivity 
             }
             lp.setSummary(summary);
 
+            lp = (ListPreference) getPreferenceScreen().findPreference("rev");
         }
 
         @Override

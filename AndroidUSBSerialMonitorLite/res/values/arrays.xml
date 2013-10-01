@@ -87,26 +87,68 @@
     
     
     <string-array name="baudrate_entries">
+        <item >300</item>
+        <item >600</item>
         <item >1200</item>
+        <item >1800</item>
         <item >2400</item>
+        <item >4000</item>
         <item >4800</item>
+        <item >7200</item>
         <item >9600</item>
         <item >14400</item>
+        <item >16000</item>
         <item >19200</item>
+        <item >28800</item>
         <item >38400</item>
+        <item >51200</item>
+        <item >56000</item>
         <item >57600</item>
+        <item >64000</item>
+        <item >76800</item>
         <item >115200</item>
+        <item >128000</item>
+        <item >153600</item>
+        <item >230400</item>
+        <item >250000</item>
+        <item >256000</item>
+        <item >460800</item>
+        <item >500000</item>
+        <item >576000</item>
+        <item >921600</item>
+        <item >2000000</item>
     </string-array>
     <string-array name="baudrate_entryvalues">
+        <item >300</item>
+        <item >600</item>
         <item >1200</item>
+        <item >1800</item>
         <item >2400</item>
+        <item >4000</item>
         <item >4800</item>
+        <item >7200</item>
         <item >9600</item>
         <item >14400</item>
+        <item >16000</item>
         <item >19200</item>
+        <item >28800</item>
         <item >38400</item>
+        <item >51200</item>
+        <item >56000</item>
         <item >57600</item>
+        <item >64000</item>
+        <item >76800</item>
         <item >115200</item>
+        <item >128000</item>
+        <item >153600</item>
+        <item >230400</item>
+        <item >250000</item>
+        <item >256000</item>
+        <item >460800</item>
+        <item >500000</item>
+        <item >576000</item>
+        <item >921600</item>
+        <item >2000000</item>
     </string-array>
     
     
@@ -149,16 +191,12 @@
     
     
     <string-array name="flowcontrol_entries">
-        <item >NONE</item>
-        <item >RTS/CTS</item>
-        <item >DTR/DSR</item>
-        <item >XON</item>
+        <item >OFF</item>
+        <item >ON</item>
     </string-array>
     <string-array name="flowcontrol_entryvalues">
         <item >0</item>
         <item >1</item>
-        <item >2</item>
-        <item >4</item>
     </string-array>
     
     
